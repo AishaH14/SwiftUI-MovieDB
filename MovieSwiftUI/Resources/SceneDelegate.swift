@@ -13,22 +13,60 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
 
-    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
-        // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
-        // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
+    func scene(
+        _ scene: UIScene,
+        willConnectTo session: UISceneSession,
+        options connectionOptions: UIScene.ConnectionOptions
+    ) {
 
-        // Use a UIHostingController as window root view controller
+        // MARK: - Authentication Dependencies
+
+        guard let baseURL = URL(
+            string: "https://api.themoviedb.org/3"
+        ) else {
+            return
+        }
+
+        let networkClient = URLSessionNetworkClient(
+            baseURL: baseURL,
+            apiKey: Bundle.main.object(
+                forInfoDictionaryKey: "TMDB_API_KEY"
+            ) as? String ?? ""
+        )
+
+        let authContainer = AuthDIContainer(
+            networkClient: networkClient
+        )
+
+        let authViewModel = authContainer.makeAuthViewModel()
+
+        // MARK: - Home Dependencies
+
         let movieStore = MovieStore.shared
-        let rootView = Home()
-            .environmentObject(MovieHomeData(movieService: movieStore, endpoints: Endpoint.allCases))
-            .environmentObject(MovieSearchData(movieService: movieStore))
-            .environmentObject(KeyboardData())
-        
-        // Use a UIHostingController as window root view controller.
+
+        let rootView = AppRootView(
+            authViewModel: authViewModel
+        )
+        .environmentObject(
+            MovieHomeData(
+                movieService: movieStore,
+                endpoints: Endpoint.allCases
+            )
+        )
+        .environmentObject(
+            MovieSearchData(movieService: movieStore)
+        )
+        .environmentObject(KeyboardData())
+
+        // MARK: - Window Setup
+
         if let windowScene = scene as? UIWindowScene {
             let window = UIWindow(windowScene: windowScene)
-            window.rootViewController = UIHostingController(rootView: rootView)
+
+            window.rootViewController = UIHostingController(
+                rootView: rootView
+            )
+
             self.window = window
             window.makeKeyAndVisible()
         }

@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -59,6 +59,15 @@
 		8BCB9E4F22AA172E003B1923 /* SafariView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		CACD8163309762F2008D3B39 /* Common */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Common; sourceTree = "<group>"; };
+		CACD817A309772B0008D3B39 /* Domain */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Domain; sourceTree = "<group>"; };
+		CACD819930977385008D3B39 /* Authentication */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Authentication; sourceTree = "<group>"; };
+		CACD81A4309773B1008D3B39 /* Endpoints */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Endpoints; sourceTree = "<group>"; };
+		CACD81A7309774E1008D3B39 /* Repositories */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Repositories; sourceTree = "<group>"; };
+		CACD81C0309781E5008D3B39 /* Data */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Data; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
 		8B21374522A7ED9A00BAB22F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
@@ -89,7 +98,13 @@
 		8B21374A22A7ED9A00BAB22F /* MovieSwiftUI */ = {
 			isa = PBXGroup;
 			children = (
+				CACD819930977385008D3B39 /* Authentication */,
+				CACD8163309762F2008D3B39 /* Common */,
 				8B1E623E22A8102600093B49 /* MovieSwiftUI.entitlements */,
+				CACD81A4309773B1008D3B39 /* Endpoints */,
+				CACD81C0309781E5008D3B39 /* Data */,
+				CACD81A7309774E1008D3B39 /* Repositories */,
+				CACD817A309772B0008D3B39 /* Domain */,
 				8B3B17CB22AA8DAD00C394F4 /* Bindings */,
 				8B3B17CA22AA8D6B00C394F4 /* Services */,
 				8B3B17C922AA8D3800C394F4 /* Model */,
@@ -187,6 +202,14 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				CACD8163309762F2008D3B39 /* Common */,
+				CACD817A309772B0008D3B39 /* Domain */,
+				CACD819930977385008D3B39 /* Authentication */,
+				CACD81A4309773B1008D3B39 /* Endpoints */,
+				CACD81A7309774E1008D3B39 /* Repositories */,
+				CACD81C0309781E5008D3B39 /* Data */,
 			);
 			name = MovieSwiftUI;
 			productName = MovieSwiftUI;
@@ -404,6 +427,7 @@
 				DEVELOPMENT_TEAM = 5C2XD9H2JS;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = MovieSwiftUI/Resources/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -427,6 +451,7 @@
 				DEVELOPMENT_TEAM = 5C2XD9H2JS;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = MovieSwiftUI/Resources/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
