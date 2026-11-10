@@ -33,8 +33,8 @@ struct AppRootView: View {
                 WelcomeView(authViewModel: authViewModel)
 
             case .guest, .signedIn:
-                HomeView(
-                    viewModel: homeViewModel,
+                MainTabView(
+                    homeViewModel: homeViewModel,
                     makeMovieDetailsViewModel: makeMovieDetailsViewModel
                 )
             }

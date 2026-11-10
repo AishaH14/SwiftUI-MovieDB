@@ -48,7 +48,6 @@ struct Search: View {
                 self.movieSearchData.movies = []
                 self.movieSearchData.isSearching = false
             })
-            .tabItem({Text("Search")})
     }
 }
 

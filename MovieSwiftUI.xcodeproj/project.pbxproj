@@ -15,10 +15,8 @@
 		8B21375822A7ED9B00BAB22F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8B21375622A7ED9B00BAB22F /* LaunchScreen.storyboard */; };
 		8B21376022A7F1EE00BAB22F /* MovieItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B21375F22A7F1EE00BAB22F /* MovieItem.swift */; };
 		8B21376422A7F73300BAB22F /* ImageData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B21376322A7F73300BAB22F /* ImageData.swift */; };
-		8B3B17CE22AA8E9200C394F4 /* Featured.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B3B17CD22AA8E9200C394F4 /* Featured.swift */; };
 		8B3B17D022AA8EEE00C394F4 /* MessageText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B3B17CF22AA8EEE00C394F4 /* MessageText.swift */; };
 		8B3CFCA122A8F5D7000E814F /* MovieItemData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B3CFCA022A8F5D7000E814F /* MovieItemData.swift */; };
-		8B540B9D22A81E11004B633F /* Home.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B540B9C22A81E11004B633F /* Home.swift */; };
 		8B540BA122A885FC004B633F /* MovieService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B540B9E22A885FC004B633F /* MovieService.swift */; };
 		8B540BA222A885FC004B633F /* Movie.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B540B9F22A885FC004B633F /* Movie.swift */; };
 		8B540BA322A885FC004B633F /* MovieStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B540BA022A885FC004B633F /* MovieStore.swift */; };
@@ -43,10 +41,8 @@
 		8B21375922A7ED9B00BAB22F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8B21375F22A7F1EE00BAB22F /* MovieItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieItem.swift; sourceTree = "<group>"; };
 		8B21376322A7F73300BAB22F /* ImageData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageData.swift; sourceTree = "<group>"; };
-		8B3B17CD22AA8E9200C394F4 /* Featured.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Featured.swift; sourceTree = "<group>"; };
 		8B3B17CF22AA8EEE00C394F4 /* MessageText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageText.swift; sourceTree = "<group>"; };
 		8B3CFCA022A8F5D7000E814F /* MovieItemData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieItemData.swift; sourceTree = "<group>"; };
-		8B540B9C22A81E11004B633F /* Home.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Home.swift; sourceTree = "<group>"; };
 		8B540B9E22A885FC004B633F /* MovieService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MovieService.swift; sourceTree = "<group>"; };
 		8B540B9F22A885FC004B633F /* Movie.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Movie.swift; sourceTree = "<group>"; };
 		8B540BA022A885FC004B633F /* MovieStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MovieStore.swift; sourceTree = "<group>"; };
@@ -128,8 +124,6 @@
 		8B3B17C722AA8D2300C394F4 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				8B540B9C22A81E11004B633F /* Home.swift */,
-				8B3B17CD22AA8E9200C394F4 /* Featured.swift */,
 				8B542ED022AA2EA300E5ACC5 /* Search.swift */,
 				8B3B17CF22AA8EEE00C394F4 /* MessageText.swift */,
 				8B540BA822A8A2B9004B633F /* MovieDetail.swift */,
@@ -280,11 +274,9 @@
 				8B21374E22A7ED9A00BAB22F /* SceneDelegate.swift in Sources */,
 				8B540BA322A885FC004B633F /* MovieStore.swift in Sources */,
 				8B540BA922A8A2B9004B633F /* MovieDetail.swift in Sources */,
-				8B3B17CE22AA8E9200C394F4 /* Featured.swift in Sources */,
 				8B542ED722AA349D00E5ACC5 /* MovieSearchData.swift in Sources */,
 				8B3CFCA122A8F5D7000E814F /* MovieItemData.swift in Sources */,
 				8B1E624222A8140C00093B49 /* MovieRow.swift in Sources */,
-				8B540B9D22A81E11004B633F /* Home.swift in Sources */,
 				8B542ED922AA581300E5ACC5 /* KeyboardData.swift in Sources */,
 				8B542ED122AA2EA300E5ACC5 /* Search.swift in Sources */,
 				8B540BA122A885FC004B633F /* MovieService.swift in Sources */,

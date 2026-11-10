@@ -90,4 +90,11 @@ final class AuthViewModel {
             errorMessage = error.localizedDescription
         }
     }
+    
+    // MARK: - Sign Out
+
+    func signOut() {
+        authState = .missing
+        errorMessage = nil
+    }
 }
