@@ -43,15 +43,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // MARK: - Home Dependencies
 
         let movieStore = MovieStore.shared
-
-        let rootView = AppRootView(
-            authViewModel: authViewModel
+        let movieContainer = MovieDIContainer(
+            networkClient: networkClient
         )
-        .environmentObject(
-            MovieHomeData(
-                movieService: movieStore,
-                endpoints: Endpoint.allCases
-            )
+        let rootView = AppRootView(
+            authViewModel: authViewModel,
+            homeViewModel: movieContainer.makeHomeViewModel(),
+            makeMovieDetailsViewModel: { movieId in
+                movieContainer.makeMovieDetailsViewModel(movieId: movieId)
+            }
         )
         .environmentObject(
             MovieSearchData(movieService: movieStore)

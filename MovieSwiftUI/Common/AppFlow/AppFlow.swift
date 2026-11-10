@@ -12,9 +12,17 @@ import SwiftUI
 struct AppRootView: View {
 
     @State private var authViewModel: AuthViewModel
+    private let homeViewModel: HomeViewModel
+    private let makeMovieDetailsViewModel: (Int) -> MovieDetailsViewModel
 
-    init(authViewModel: AuthViewModel) {
+    init(
+        authViewModel: AuthViewModel,
+        homeViewModel: HomeViewModel,
+        makeMovieDetailsViewModel: @escaping (Int) -> MovieDetailsViewModel
+    ) {
         _authViewModel = State(initialValue: authViewModel)
+        self.homeViewModel = homeViewModel
+        self.makeMovieDetailsViewModel = makeMovieDetailsViewModel
     }
 
     var body: some View {
@@ -25,7 +33,10 @@ struct AppRootView: View {
                 WelcomeView(authViewModel: authViewModel)
 
             case .guest, .signedIn:
-                Home()
+                HomeView(
+                    viewModel: homeViewModel,
+                    makeMovieDetailsViewModel: makeMovieDetailsViewModel
+                )
             }
         }
     }

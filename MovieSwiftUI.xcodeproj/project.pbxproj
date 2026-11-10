@@ -66,6 +66,7 @@
 		CACD81A4309773B1008D3B39 /* Endpoints */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Endpoints; sourceTree = "<group>"; };
 		CACD81A7309774E1008D3B39 /* Repositories */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Repositories; sourceTree = "<group>"; };
 		CACD81C0309781E5008D3B39 /* Data */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Data; sourceTree = "<group>"; };
+		CACD8344309B33B7008D3B39 /* Home */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Home; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,6 +99,7 @@
 		8B21374A22A7ED9A00BAB22F /* MovieSwiftUI */ = {
 			isa = PBXGroup;
 			children = (
+				CACD8344309B33B7008D3B39 /* Home */,
 				CACD819930977385008D3B39 /* Authentication */,
 				CACD8163309762F2008D3B39 /* Common */,
 				8B1E623E22A8102600093B49 /* MovieSwiftUI.entitlements */,
@@ -210,6 +212,7 @@
 				CACD81A4309773B1008D3B39 /* Endpoints */,
 				CACD81A7309774E1008D3B39 /* Repositories */,
 				CACD81C0309781E5008D3B39 /* Data */,
+				CACD8344309B33B7008D3B39 /* Home */,
 			);
 			name = MovieSwiftUI;
 			productName = MovieSwiftUI;
