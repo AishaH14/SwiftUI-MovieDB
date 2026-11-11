@@ -14,6 +14,7 @@ struct MainTabView: View {
     let profileViewModel: ProfileViewModel
     let authState: AuthState
     let makeMovieDetailsViewModel: (Int) -> MovieDetailsViewModel
+    let makeListsViewModel: (String) -> ListsViewModel
     let onLogout: () -> Void
 
     var body: some View {
@@ -34,6 +35,7 @@ struct MainTabView: View {
             ProfileView(
                 viewModel: profileViewModel,
                 authState: authState,
+                makeListsViewModel: makeListsViewModel,
                 onLogout: onLogout
             )
             .tabItem {

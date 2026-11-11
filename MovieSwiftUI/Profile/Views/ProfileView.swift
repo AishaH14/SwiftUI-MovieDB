@@ -11,16 +11,20 @@ import SwiftUI
 struct ProfileView: View {
 
     @State private var viewModel: ProfileViewModel
+    @State private var isShowingLists = false
     private let authState: AuthState
+    private let makeListsViewModel: (String) -> ListsViewModel
     private let onLogout: () -> Void
 
     init(
         viewModel: ProfileViewModel,
         authState: AuthState,
+        makeListsViewModel: @escaping (String) -> ListsViewModel,
         onLogout: @escaping () -> Void
     ) {
         _viewModel = State(initialValue: viewModel)
         self.authState = authState
+        self.makeListsViewModel = makeListsViewModel
         self.onLogout = onLogout
     }
 
@@ -36,6 +40,11 @@ struct ProfileView: View {
             .background(Color(.systemGroupedBackground))
             .navigationTitle("Profile")
             .navigationBarTitleDisplayMode(.inline)
+            .navigationDestination(isPresented: $isShowingLists) {
+                if case .signedIn(let sessionId) = authState {
+                    ListsView(viewModel: makeListsViewModel(sessionId))
+                }
+            }
         }
         .task {
             await viewModel.load(authState: authState)
@@ -113,15 +122,17 @@ struct ProfileView: View {
     private var rows: some View {
         VStack(spacing: 0) {
             ProfileRow(title: "Lists", systemImage: "list.bullet.rectangle") {
-                // Lists navigation will be added on day two.
+                if isSignedIn {
+                    isShowingLists = true
+                }
             }
             Divider()
             ProfileRow(title: "Favorites", systemImage: "heart") {
-                // Implemented in Week 04.
+               
             }
             Divider()
             ProfileRow(title: "Watchlist", systemImage: "bookmark") {
-                // Implemented in Week 04.
+               
             }
 
             if isSignedIn {
