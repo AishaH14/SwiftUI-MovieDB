@@ -11,7 +11,10 @@ import SwiftUI
 struct MainTabView: View {
 
     let homeViewModel: HomeViewModel
+    let profileViewModel: ProfileViewModel
+    let authState: AuthState
     let makeMovieDetailsViewModel: (Int) -> MovieDetailsViewModel
+    let onLogout: () -> Void
 
     var body: some View {
         TabView {
@@ -28,11 +31,14 @@ struct MainTabView: View {
                     Label("Search", systemImage: "magnifyingglass")
                 }
 
-            // Replaced by ProfileView in the next steps.
-            Text("Profile")
-                .tabItem {
-                    Label("Profile", systemImage: "person")
-                }
+            ProfileView(
+                viewModel: profileViewModel,
+                authState: authState,
+                onLogout: onLogout
+            )
+            .tabItem {
+                Label("Profile", systemImage: "person")
+            }
         }
     }
 }

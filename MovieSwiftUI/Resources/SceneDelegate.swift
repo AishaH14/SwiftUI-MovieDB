@@ -46,9 +46,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let movieContainer = MovieDIContainer(
             networkClient: networkClient
         )
+        let profileContainer = ProfileDIContainer(
+            networkClient: networkClient
+        )
+
         let rootView = AppRootView(
             authViewModel: authViewModel,
             homeViewModel: movieContainer.makeHomeViewModel(),
+            profileViewModel: profileContainer.makeProfileViewModel(),
             makeMovieDetailsViewModel: { movieId in
                 movieContainer.makeMovieDetailsViewModel(movieId: movieId)
             }
