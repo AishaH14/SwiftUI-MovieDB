@@ -127,7 +127,8 @@ private struct PreviewCreateSessionUseCase: CreateSessionUseCase {
         authViewModel: AuthViewModel(
             createGuestSessionUseCase: PreviewGuestSessionUseCase(),
             createRequestTokenUseCase: PreviewRequestTokenUseCase(),
-            createSessionUseCase: PreviewCreateSessionUseCase()
+            createSessionUseCase: PreviewCreateSessionUseCase(),
+            authSessionStorage: InMemoryAuthSessionStorage()
         )
     )
 }
