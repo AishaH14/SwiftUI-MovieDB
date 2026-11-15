@@ -107,7 +107,13 @@ struct ListsView: View {
         case .loaded:
             List {
                 ForEach(viewModel.lists) { list in
-                    ListRow(list: list)
+                    NavigationLink {
+                        ListDetailsView(
+                            viewModel: viewModel.makeListDetailsViewModel(listId: list.id)
+                        )
+                    } label: {
+                        ListRow(list: list)
+                    }
                         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                             Button {
                                 listToDelete = list
@@ -129,6 +135,7 @@ struct ListsView: View {
             .listStyle(.insetGrouped)
         }
     }
+    
 }
 
 // MARK: - Row

@@ -12,10 +12,9 @@ struct MainTabView: View {
 
     let homeViewModel: HomeViewModel
     let profileViewModel: ProfileViewModel
-    let authState: AuthState
+    let authViewModel: AuthViewModel
     let makeMovieDetailsViewModel: (Int) -> MovieDetailsViewModel
     let makeListsViewModel: (String) -> ListsViewModel
-    let onLogout: () -> Void
 
     var body: some View {
         TabView {
@@ -34,9 +33,8 @@ struct MainTabView: View {
 
             ProfileView(
                 viewModel: profileViewModel,
-                authState: authState,
-                makeListsViewModel: makeListsViewModel,
-                onLogout: onLogout
+                authViewModel: authViewModel,
+                makeListsViewModel: makeListsViewModel
             )
             .tabItem {
                 Label("Profile", systemImage: "person")

@@ -72,7 +72,7 @@ final class URLSessionNetworkClient: NetworkClient {
         }
 
         components.queryItems = endpoint.queryItems
-            + [URLQueryItem(name: "api_key", value: apiKey)]
+        + [URLQueryItem(name: APIParameters.apiKey, value: apiKey)]
 
         guard let finalURL = components.url else {
             throw NetworkError.invalidURL

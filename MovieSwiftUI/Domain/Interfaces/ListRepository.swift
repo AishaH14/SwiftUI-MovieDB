@@ -23,4 +23,8 @@ protocol ListRepository {
         listId: Int,
         sessionId: String)
     async throws
+    func fetchListDetails(
+        listId: Int)
+    async throws -> ListDetails
 }
+

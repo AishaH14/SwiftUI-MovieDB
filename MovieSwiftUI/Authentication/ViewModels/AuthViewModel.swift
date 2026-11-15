@@ -28,7 +28,10 @@ final class AuthViewModel {
     private(set) var loadingAction: LoadingAction?
     private(set) var errorMessage: String?
     var isLoading: Bool { loadingAction != nil }
-
+    var isSignedIn: Bool {
+        if case .signedIn = authState { return true }
+        return false
+    }
     init(
         createGuestSessionUseCase: any CreateGuestSessionUseCase,
         createRequestTokenUseCase: any CreateRequestTokenUseCase,
@@ -85,7 +88,7 @@ final class AuthViewModel {
 
             authState = .signedIn(sessionId: sessionId)
         } catch is CancellationError {
-            // Cancelled
+           
         } catch {
             errorMessage = error.localizedDescription
         }

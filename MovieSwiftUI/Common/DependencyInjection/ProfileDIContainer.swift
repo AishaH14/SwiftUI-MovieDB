@@ -8,10 +8,10 @@
 import Foundation
 
 final class ProfileDIContainer {
-
+    
     private let accountRepository: any AccountRepository
     private let listRepository: any ListRepository
-
+    
     init(networkClient: any NetworkClient) {
         self.accountRepository = DefaultAccountRepository(
             networkClient: networkClient
@@ -20,43 +20,49 @@ final class ProfileDIContainer {
             networkClient: networkClient
         )
     }
-
+    
     // MARK: - Use Cases
-
+    
     func makeFetchAccountUseCase() -> any FetchAccountUseCase {
         DefaultFetchAccountUseCase(
             accountRepository: accountRepository
         )
     }
-
+    
     func makeFetchListsUseCase() -> any FetchListsUseCase {
         DefaultFetchListsUseCase(
             accountRepository: accountRepository,
             listRepository: listRepository
         )
     }
-
+    
     func makeCreateListUseCase() -> any CreateListUseCase {
         DefaultCreateListUseCase(
             listRepository: listRepository
         )
     }
-
+    
     func makeDeleteListUseCase() -> any DeleteListUseCase {
         DefaultDeleteListUseCase(
             listRepository: listRepository
         )
     }
-
+    
+    func makeFetchListDetailsUseCase() -> any FetchListDetailsUseCase {
+        DefaultFetchListDetailsUseCase(
+            listRepository: listRepository
+        )
+    }
+    
     // MARK: - ViewModels
-
+    
     @MainActor
     func makeProfileViewModel() -> ProfileViewModel {
         ProfileViewModel(
             fetchAccountUseCase: makeFetchAccountUseCase()
         )
     }
-
+    
     @MainActor
     func makeListsViewModel(sessionId: String) -> ListsViewModel {
         ListsViewModel(
@@ -65,15 +71,26 @@ final class ProfileDIContainer {
             deleteListUseCase: makeDeleteListUseCase(),
             makeCreateListViewModel: { [unowned self] in
                 self.makeCreateListViewModel(sessionId: sessionId)
+            },
+            makeListDetailsViewModel: { [unowned self] listId in
+                self.makeListDetailsViewModel(listId: listId)
             }
         )
     }
-
+    
     @MainActor
     func makeCreateListViewModel(sessionId: String) -> CreateListViewModel {
         CreateListViewModel(
             sessionId: sessionId,
             createListUseCase: makeCreateListUseCase()
+        )
+    }
+
+    @MainActor
+    func makeListDetailsViewModel(listId: Int) -> ListDetailsViewModel {
+        ListDetailsViewModel(
+            listId: listId,
+            fetchListDetailsUseCase: makeFetchListDetailsUseCase()
         )
     }
 }

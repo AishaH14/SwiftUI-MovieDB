@@ -1,5 +1,5 @@
 //
-//  ProfileViewModels.swift
+//  ProfileViewModel.swift
 //  MovieSwiftUI
 //
 //  Created by Aisha Hudasi on 01/06/1448 AH.
@@ -29,9 +29,12 @@ final class ProfileViewModel {
 
     func load(authState: AuthState) async {
         switch authState {
-        case .missing, .guest:
+        case .guest:
             state = .guest
 
+        case .missing:
+            
+            break
         case .signedIn(let sessionId):
             state = .loading
 

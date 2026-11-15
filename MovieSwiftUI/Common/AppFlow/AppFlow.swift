@@ -42,10 +42,9 @@ struct AppRootView: View {
                 MainTabView(
                     homeViewModel: homeViewModel,
                     profileViewModel: profileViewModel,
-                    authState: authViewModel.authState,
+                    authViewModel: authViewModel,
                     makeMovieDetailsViewModel: makeMovieDetailsViewModel,
-                    makeListsViewModel: makeListsViewModel,
-                    onLogout: authViewModel.signOut
+                    makeListsViewModel: makeListsViewModel
                 )
             }
         }

@@ -95,15 +95,10 @@ struct WelcomeView: View {
     // MARK: - Web Authentication
 
     private func authenticate(url: URL, scheme: String) async throws -> URL {
-        do {
-            return try await webAuthenticationSession.authenticate(
-                using: url,
-                callbackURLScheme: scheme
-            )
-        } catch let error as ASWebAuthenticationSessionError
-                    where error.code == .canceledLogin {
-            throw CancellationError()
-        }
+        try await webAuthenticationSession.authenticateWithTMDB(
+            url: url,
+            callbackScheme: scheme
+        )
     }
 }
 

@@ -22,7 +22,8 @@ final class ListsViewModel {
     private let fetchListsUseCase: any FetchListsUseCase
     private let deleteListUseCase: any DeleteListUseCase
     private let createListViewModelFactory: () -> CreateListViewModel
-
+    private let listDetailsViewModelFactory: (Int) -> ListDetailsViewModel
+    
     private(set) var state: State = .loading
     private(set) var lists: [MovieList] = []
     private(set) var isLoadingNextPage = false
@@ -35,18 +36,23 @@ final class ListsViewModel {
         sessionId: String,
         fetchListsUseCase: any FetchListsUseCase,
         deleteListUseCase: any DeleteListUseCase,
-        makeCreateListViewModel: @escaping () -> CreateListViewModel
+        makeCreateListViewModel: @escaping () -> CreateListViewModel,
+        makeListDetailsViewModel: @escaping (Int) -> ListDetailsViewModel
     ) {
         self.sessionId = sessionId
         self.fetchListsUseCase = fetchListsUseCase
         self.deleteListUseCase = deleteListUseCase
         self.createListViewModelFactory = makeCreateListViewModel
+        self.listDetailsViewModelFactory = makeListDetailsViewModel
     }
 
     func makeCreateListViewModel() -> CreateListViewModel {
         createListViewModelFactory()
     }
 
+    func makeListDetailsViewModel(listId: Int) -> ListDetailsViewModel {
+        listDetailsViewModelFactory(listId)
+    }
     // MARK: - Loading
 
     func loadFirstPage() async {
@@ -64,9 +70,9 @@ final class ListsViewModel {
             totalPages = page.totalPages
             state = .loaded
         } catch is CancellationError {
-            // Cancelled: expected, no error shown
+            
         } catch let error as URLError where error.code == .cancelled {
-            // Cancelled: expected, no error shown
+            
         } catch {
             state = .failed(error.localizedDescription)
         }
@@ -89,7 +95,7 @@ final class ListsViewModel {
             currentPage = page.page
             totalPages = page.totalPages
         } catch {
-            // Keep current lists; the next scroll will try again.
+           
         }
     }
 
@@ -103,8 +109,6 @@ final class ListsViewModel {
             )
             lists.removeAll { $0.id == list.id }
         } catch {
-            // TMDB can return an error even when the list was deleted,
-            // so reload to show the real state.
             await loadFirstPage()
 
             if lists.contains(where: { $0.id == list.id }) {

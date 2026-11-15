@@ -13,9 +13,7 @@ enum AccountEndpoints {
     static func details(sessionId: String) -> APIEndpoint<AccountResponseDTO> {
         APIEndpoint(
             path: "account",
-            queryItems: [
-                URLQueryItem(name: "session_id", value: sessionId)
-            ]
+                queryItems: [.sessionId(sessionId)]
         )
     }
 }

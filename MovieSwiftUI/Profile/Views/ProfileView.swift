@@ -11,21 +11,17 @@ import SwiftUI
 struct ProfileView: View {
 
     @State private var viewModel: ProfileViewModel
-    @State private var isShowingLists = false
-    private let authState: AuthState
+    private let authViewModel: AuthViewModel
     private let makeListsViewModel: (String) -> ListsViewModel
-    private let onLogout: () -> Void
 
     init(
         viewModel: ProfileViewModel,
-        authState: AuthState,
-        makeListsViewModel: @escaping (String) -> ListsViewModel,
-        onLogout: @escaping () -> Void
+        authViewModel: AuthViewModel,
+        makeListsViewModel: @escaping (String) -> ListsViewModel
     ) {
         _viewModel = State(initialValue: viewModel)
-        self.authState = authState
+        self.authViewModel = authViewModel
         self.makeListsViewModel = makeListsViewModel
-        self.onLogout = onLogout
     }
 
     var body: some View {
@@ -40,14 +36,10 @@ struct ProfileView: View {
             .background(Color(.systemGroupedBackground))
             .navigationTitle("Profile")
             .navigationBarTitleDisplayMode(.inline)
-            .navigationDestination(isPresented: $isShowingLists) {
-                if case .signedIn(let sessionId) = authState {
-                    ListsView(viewModel: makeListsViewModel(sessionId))
-                }
-            }
         }
-        .task {
-            await viewModel.load(authState: authState)
+        // Reloads the header after signing in from a sign-in page.
+        .task(id: authViewModel.isSignedIn) {
+            await viewModel.load(authState: authViewModel.authState)
         }
     }
 
@@ -82,7 +74,7 @@ struct ProfileView: View {
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                     Button("Retry") {
-                        Task { await viewModel.load(authState: authState) }
+                        Task { await viewModel.load(authState: authViewModel.authState) }
                     }
                 }
                 .frame(maxWidth: .infinity)
@@ -114,66 +106,128 @@ struct ProfileView: View {
 
     // MARK: - Rows
 
-    private var isSignedIn: Bool {
-        if case .signedIn = authState { return true }
-        return false
+    private var sessionId: String? {
+        if case .signedIn(let sessionId) = authViewModel.authState { return sessionId }
+        return nil
     }
 
     private var rows: some View {
         VStack(spacing: 0) {
-            ProfileRow(title: "Lists", systemImage: "list.bullet.rectangle") {
-                if isSignedIn {
-                    isShowingLists = true
-                }
-            }
+            listsRow
             Divider()
-            ProfileRow(title: "Favorites", systemImage: "heart") {
-               
-            }
+            favoritesRow
             Divider()
-            ProfileRow(title: "Watchlist", systemImage: "bookmark") {
-               
-            }
+            watchlistRow
 
-            if isSignedIn {
+            if sessionId != nil {
                 Divider()
-                ProfileRow(
-                    title: "Logout",
-                    systemImage: "rectangle.portrait.and.arrow.right",
-                    isDestructive: true,
-                    action: onLogout
-                )
+                Button {
+                    authViewModel.signOut()
+                } label: {
+                    ProfileRowLabel(
+                        title: "Logout",
+                        systemImage: "rectangle.portrait.and.arrow.right",
+                        isDestructive: true
+                    )
+                }
             }
         }
         .background(Color(.secondarySystemGroupedBackground))
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
+
+    @ViewBuilder
+    private var listsRow: some View {
+        if let sessionId {
+            NavigationLink {
+                ListsView(viewModel: makeListsViewModel(sessionId))
+            } label: {
+                ProfileRowLabel(title: "Lists", systemImage: "list.bullet.rectangle")
+            }
+        } else {
+            guestRow(
+                title: "Lists",
+                navigationTitle: "My Lists",
+                systemImage: "list.bullet.rectangle",
+                message: "Sign in to TMDB to create and manage your lists."
+            )
+        }
+    }
+
+    @ViewBuilder
+    private var favoritesRow: some View {
+        if sessionId != nil {
+            // Favorites screen is planned for Week 04.
+            Button {} label: {
+                ProfileRowLabel(title: "Favorites", systemImage: "heart")
+            }
+        } else {
+            guestRow(
+                title: "Favorites",
+                navigationTitle: "Favorites",
+                systemImage: "heart",
+                message: "Sign in to TMDB to save your favorite movies."
+            )
+        }
+    }
+
+    @ViewBuilder
+    private var watchlistRow: some View {
+        if sessionId != nil {
+            // Watchlist screen is planned for Week 04.
+            Button {} label: {
+                ProfileRowLabel(title: "Watchlist", systemImage: "bookmark")
+            }
+        } else {
+            guestRow(
+                title: "Watchlist",
+                navigationTitle: "Watchlist",
+                systemImage: "bookmark",
+                message: "Sign in to TMDB to keep track of movies you want to watch."
+            )
+        }
+    }
+
+    private func guestRow(
+        title: String,
+        navigationTitle: String,
+        systemImage: String,
+        message: String
+    ) -> some View {
+        NavigationLink {
+            SignInPromptView(
+                authViewModel: authViewModel,
+                navigationTitle: navigationTitle,
+                title: "Sign in to use \(navigationTitle)",
+                message: message
+            )
+        } label: {
+            ProfileRowLabel(title: title, systemImage: systemImage)
+        }
+    }
 }
 
-// MARK: - Row
+// MARK: - Row Label
 
-private struct ProfileRow: View {
+private struct ProfileRowLabel: View {
 
     let title: String
     let systemImage: String
     var isDestructive = false
-    let action: () -> Void
 
     var body: some View {
-        Button(action: action) {
-            HStack(spacing: 12) {
-                Image(systemName: systemImage)
-                    .frame(width: 24)
-                Text(title)
-                Spacer()
-                if !isDestructive {
-                    Image(systemName: "chevron.right")
-                        .font(.footnote)
-                        .foregroundStyle(.tertiary)
-                }
+        HStack(spacing: 12) {
+            Image(systemName: systemImage)
+                .frame(width: 24)
+            Text(title)
+            Spacer()
+            if !isDestructive {
+                Image(systemName: "chevron.right")
+                    .font(.footnote)
+                    .foregroundStyle(.tertiary)
             }
-            .foregroundStyle(isDestructive ? Color.red : Color.primary)
-            .padding()
         }
+        .foregroundStyle(isDestructive ? Color.red : Color.primary)
+        .padding()
     }
 }
