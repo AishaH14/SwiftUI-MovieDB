@@ -18,10 +18,11 @@ final class DefaultMovieRepository: MovieRepository {
 
     func fetchMovies(
         section: MovieSection,
+        category: MediaCategory,
         page: Int
     ) async throws -> MoviesPage {
         let response = try await networkClient.request(
-            endpoint(for: section, page: page)
+            MovieEndpoints.section(section, category: category, page: page)
         )
         return response.toDomain()
     }
@@ -33,21 +34,21 @@ final class DefaultMovieRepository: MovieRepository {
         return response.toDomain()
     }
 
-    // MARK: - Helpers
-
-    private func endpoint(
-        for section: MovieSection,
+    func searchMovies(
+        query: String,
+        category: MediaCategory,
         page: Int
-    ) -> APIEndpoint<MovieResponseDTO> {
-        switch section {
-        case .nowPlaying:
-            MovieEndpoints.nowPlaying(page: page)
-        case .popular:
-            MovieEndpoints.popular(page: page)
-        case .topRated:
-            MovieEndpoints.topRated(page: page)
-        case .upcoming:
-            MovieEndpoints.upcoming(page: page)
-        }
+    ) async throws -> MoviesPage {
+        let response = try await networkClient.request(
+            MovieEndpoints.search(query: query, category: category, page: page)
+        )
+        return response.toDomain()
+    }
+
+    func fetchGenres(category: MediaCategory) async throws -> [Genre] {
+        let response = try await networkClient.request(
+            MovieEndpoints.genres(category: category)
+        )
+        return response.toDomain()
     }
 }

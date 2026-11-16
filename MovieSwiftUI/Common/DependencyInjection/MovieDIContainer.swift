@@ -12,6 +12,7 @@ final class MovieDIContainer {
 
     private let movieRepository: any MovieRepository
     private let accountRepository: any AccountRepository
+    private let moviesQueriesRepository: any MoviesQueriesRepository
 
     init(
         networkClient: any NetworkClient,
@@ -21,6 +22,7 @@ final class MovieDIContainer {
             networkClient: networkClient
         )
         self.accountRepository = accountRepository
+        self.moviesQueriesRepository = UserDefaultsMoviesQueriesRepository()
     }
 
     // MARK: - Use Cases
@@ -43,6 +45,13 @@ final class MovieDIContainer {
         )
     }
 
+    func makeSearchMoviesUseCase() -> any SearchMoviesUseCase {
+        DefaultSearchMoviesUseCase(
+            movieRepository: movieRepository,
+            moviesQueriesRepository: moviesQueriesRepository
+        )
+    }
+
     // MARK: - ViewModels
 
     @MainActor
@@ -58,6 +67,15 @@ final class MovieDIContainer {
             movieId: movieId,
             fetchMovieDetailsUseCase: makeFetchMovieDetailsUseCase(),
             movieUserStateUseCase: makeMovieUserStateUseCase()
+        )
+    }
+
+    @MainActor
+    func makeMoviesListViewModel(source: MoviesListSource) -> MoviesListViewModel {
+        MoviesListViewModel(
+            source: source,
+            searchMoviesUseCase: makeSearchMoviesUseCase(),
+            fetchMoviesUseCase: makeFetchMoviesUseCase()
         )
     }
 }

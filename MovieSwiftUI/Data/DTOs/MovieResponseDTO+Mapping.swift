@@ -16,13 +16,18 @@ struct MovieResponseDTO: Decodable {
 
 struct MovieDTO: Decodable {
     let id: Int
-    let title: String
-    let overview: String
+    let title: String?
+    let name: String?
+    let overview: String?
     let posterPath: String?
     let backdropPath: String?
-    let voteAverage: Double
+    let voteAverage: Double?
     let releaseDate: String?
+    let firstAirDate: String?
+    let genreIds: [Int]?
 }
+
+// MARK: - Mappings to Domain
 
 extension MovieResponseDTO {
     func toDomain() -> MoviesPage {
@@ -38,11 +43,13 @@ extension MovieDTO {
     func toDomain() -> MovieSummary {
         MovieSummary(
             id: id,
-            title: title,
-            overview: overview,
+            title: title ?? name ?? "",
+            overview: overview ?? "",
             posterPath: posterPath,
             backdropPath: backdropPath,
-            rating: voteAverage
+            rating: voteAverage ?? 0,
+            releaseDate: releaseDate ?? firstAirDate,
+            genreIds: genreIds ?? []
         )
     }
 }

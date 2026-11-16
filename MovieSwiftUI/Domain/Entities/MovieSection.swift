@@ -25,3 +25,17 @@ enum MovieSection: CaseIterable, Identifiable, Hashable, Sendable {
         }
     }
 }
+
+enum MediaCategory: CaseIterable, Identifiable, Hashable, Sendable {
+    case movies
+    case tvShows
+
+    var id: Self { self }
+
+    var title: String {
+        switch self {
+        case .movies: "Movies"
+        case .tvShows: "TV Shows"
+        }
+    }
+}

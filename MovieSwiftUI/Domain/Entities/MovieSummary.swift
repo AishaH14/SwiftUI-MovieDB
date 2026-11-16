@@ -5,6 +5,7 @@
 //  Created by Aisha Hudasi on 24/05/1448 AH.
 //  Copyright © 1448 AH Alfian Losari. All rights reserved.
 //
+
 import Foundation
 
 struct MovieSummary: Identifiable, Hashable, Sendable {
@@ -14,6 +15,8 @@ struct MovieSummary: Identifiable, Hashable, Sendable {
     let posterPath: String?
     let backdropPath: String?
     let rating: Double
+    let releaseDate: String?
+    let genreIds: [Int]
 }
 
 struct MoviesPage: Sendable {
@@ -25,4 +28,9 @@ struct MoviesPage: Sendable {
 struct MovieUserState: Sendable {
     let isFavorite: Bool
     let isInWatchlist: Bool
+}
+
+struct Genre: Identifiable, Hashable, Sendable {
+    let id: Int
+    let name: String
 }

@@ -13,6 +13,8 @@ enum APIParameters {
     static let sessionId = "session_id"
     static let page = "page"
     static let movieId = "movie_id"
+    static let query = "query"
+    static let language = "language"
 }
 
 extension URLQueryItem {
@@ -24,8 +26,12 @@ extension URLQueryItem {
     static func page(_ page: Int) -> URLQueryItem {
         URLQueryItem(name: APIParameters.page, value: String(page))
     }
-    
+
     static func movieId(_ movieId: Int) -> URLQueryItem {
         URLQueryItem(name: APIParameters.movieId, value: String(movieId))
+    }
+
+    static func query(_ query: String) -> URLQueryItem {
+        URLQueryItem(name: APIParameters.query, value: query)
     }
 }

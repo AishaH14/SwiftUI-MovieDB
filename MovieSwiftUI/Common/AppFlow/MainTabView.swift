@@ -11,12 +11,14 @@ import SwiftUI
 struct MainTabView: View {
 
     let homeViewModel: HomeViewModel
+    let searchViewModel: MoviesListViewModel
     let profileViewModel: ProfileViewModel
     let authViewModel: AuthViewModel
     let makeMovieDetailsViewModel: (Int) -> MovieDetailsViewModel
     let makeListsViewModel: (String) -> ListsViewModel
     let makeSelectListViewModel: (Int, String) -> SelectListViewModel
     let makeMediaListViewModel: (MediaListSource, String) -> MediaListViewModel
+    let makeMoviesListViewModel: (MoviesListSource) -> MoviesListViewModel
 
     var body: some View {
         TabView {
@@ -24,16 +26,24 @@ struct MainTabView: View {
                 viewModel: homeViewModel,
                 authViewModel: authViewModel,
                 makeMovieDetailsViewModel: makeMovieDetailsViewModel,
-                makeSelectListViewModel: makeSelectListViewModel
+                makeSelectListViewModel: makeSelectListViewModel,
+                makeMoviesListViewModel: makeMoviesListViewModel
             )
             .tabItem {
                 Label("Home", systemImage: "house")
             }
 
-            Search()
-                .tabItem {
-                    Label("Search", systemImage: "magnifyingglass")
-                }
+            NavigationStack {
+                MoviesListView(
+                    viewModel: searchViewModel,
+                    authViewModel: authViewModel,
+                    makeMovieDetailsViewModel: makeMovieDetailsViewModel,
+                    makeSelectListViewModel: makeSelectListViewModel
+                )
+            }
+            .tabItem {
+                Label("Movies", systemImage: "magnifyingglass")
+            }
 
             ProfileView(
                 viewModel: profileViewModel,

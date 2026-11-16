@@ -28,9 +28,11 @@ struct MovieSectionView: View {
 
             Spacer()
 
-            Text("See All")
-                .font(.caption)
-                .foregroundStyle(Color.accentColor)
+            NavigationLink(value: section) {
+                Text("See All")
+                    .font(.caption)
+                    .foregroundStyle(Color.accentColor)
+            }
         }
         .padding(.horizontal)
     }

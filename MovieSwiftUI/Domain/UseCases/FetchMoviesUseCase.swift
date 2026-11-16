@@ -11,6 +11,7 @@ import Foundation
 protocol FetchMoviesUseCase {
     func execute(
         section: MovieSection,
+        category: MediaCategory,
         page: Int
     ) async throws -> MoviesPage
 }

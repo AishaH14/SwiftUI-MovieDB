@@ -54,6 +54,7 @@ final class HomeViewModel {
         do {
             let moviesPage = try await fetchMoviesUseCase.execute(
                 section: section,
+                category: .movies,
                 page: 1
             )
             sectionStates[section] = .loaded(

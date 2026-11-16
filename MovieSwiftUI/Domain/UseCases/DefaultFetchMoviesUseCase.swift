@@ -18,10 +18,12 @@ final class DefaultFetchMoviesUseCase: FetchMoviesUseCase {
 
     func execute(
         section: MovieSection,
+        category: MediaCategory,
         page: Int
     ) async throws -> MoviesPage {
         try await movieRepository.fetchMovies(
             section: section,
+            category: category,
             page: page
         )
     }

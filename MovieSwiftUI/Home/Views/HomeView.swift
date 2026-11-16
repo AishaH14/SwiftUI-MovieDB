@@ -14,17 +14,20 @@ struct HomeView: View {
     private let authViewModel: AuthViewModel
     private let makeMovieDetailsViewModel: (Int) -> MovieDetailsViewModel
     private let makeSelectListViewModel: (Int, String) -> SelectListViewModel
+    private let makeMoviesListViewModel: (MoviesListSource) -> MoviesListViewModel
 
     init(
         viewModel: HomeViewModel,
         authViewModel: AuthViewModel,
         makeMovieDetailsViewModel: @escaping (Int) -> MovieDetailsViewModel,
-        makeSelectListViewModel: @escaping (Int, String) -> SelectListViewModel
+        makeSelectListViewModel: @escaping (Int, String) -> SelectListViewModel,
+        makeMoviesListViewModel: @escaping (MoviesListSource) -> MoviesListViewModel
     ) {
         _viewModel = State(initialValue: viewModel)
         self.authViewModel = authViewModel
         self.makeMovieDetailsViewModel = makeMovieDetailsViewModel
         self.makeSelectListViewModel = makeSelectListViewModel
+        self.makeMoviesListViewModel = makeMoviesListViewModel
     }
 
     var body: some View {
@@ -54,6 +57,14 @@ struct HomeView: View {
                 MovieDetailsView(
                     viewModel: makeMovieDetailsViewModel(item.id),
                     authViewModel: authViewModel,
+                    makeSelectListViewModel: makeSelectListViewModel
+                )
+            }
+            .navigationDestination(for: MovieSection.self) { section in
+                MoviesListView(
+                    viewModel: makeMoviesListViewModel(.section(section)),
+                    authViewModel: authViewModel,
+                    makeMovieDetailsViewModel: makeMovieDetailsViewModel,
                     makeSelectListViewModel: makeSelectListViewModel
                 )
             }

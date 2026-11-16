@@ -42,7 +42,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         // MARK: - Home Dependencies
 
-        let movieStore = MovieStore.shared
         let accountRepository = DefaultAccountRepository(
             networkClient: networkClient
         )
@@ -58,6 +57,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let rootView = AppRootView(
             authViewModel: authViewModel,
             homeViewModel: movieContainer.makeHomeViewModel(),
+            searchViewModel: movieContainer.makeMoviesListViewModel(source: .search),
             profileViewModel: profileContainer.makeProfileViewModel(),
             makeMovieDetailsViewModel: { movieId in
                 movieContainer.makeMovieDetailsViewModel(movieId: movieId)
@@ -70,12 +70,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             },
             makeMediaListViewModel: { source, sessionId in
                 profileContainer.makeMediaListViewModel(source: source, sessionId: sessionId)
+            },
+            makeMoviesListViewModel: { source in
+                movieContainer.makeMoviesListViewModel(source: source)
             }
         )
-        .environmentObject(
-            MovieSearchData(movieService: movieStore)
-        )
-        .environmentObject(KeyboardData())
 
         // MARK: - Window Setup
 

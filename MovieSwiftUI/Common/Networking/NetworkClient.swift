@@ -36,6 +36,7 @@ final class URLSessionNetworkClient: NetworkClient {
 
     private let baseURL: URL
     private let apiKey: String
+    private let language: String
     private let session: URLSession
 
     private let decoder: JSONDecoder = {
@@ -53,10 +54,12 @@ final class URLSessionNetworkClient: NetworkClient {
     init(
         baseURL: URL,
         apiKey: String,
+        language: String = Locale.preferredLanguages.first ?? "en",
         session: URLSession = .shared
     ) {
         self.baseURL = baseURL
         self.apiKey = apiKey
+        self.language = language
         self.session = session
     }
 
@@ -72,7 +75,10 @@ final class URLSessionNetworkClient: NetworkClient {
         }
 
         components.queryItems = endpoint.queryItems
-        + [URLQueryItem(name: APIParameters.apiKey, value: apiKey)]
+        + [
+            URLQueryItem(name: APIParameters.apiKey, value: apiKey),
+            URLQueryItem(name: APIParameters.language, value: language)
+        ]
 
         guard let finalURL = components.url else {
             throw NetworkError.invalidURL
