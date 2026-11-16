@@ -71,13 +71,7 @@ final class DefaultListRepository: ListRepository {
         let response = try await networkClient.request(
             ListEndpoints.listDetails(listId: listId)
         )
-
-        return ListDetails(
-            id: response.id,
-            name: response.name,
-            itemCount: response.itemCount,
-            items: response.items.map(makeListItem)
-        )
+        return response.toDomain()
     }
     func addMovieToList(
         listId: Int,
@@ -124,14 +118,6 @@ final class DefaultListRepository: ListRepository {
             name: dto.name,
             description: dto.description ?? "",
             itemCount: dto.itemCount,
-            posterPath: dto.posterPath
-        )
-    }
-    
-    private func makeListItem(from dto: ListItemDTO) -> ListItem {
-        ListItem(
-            id: dto.id,
-            title: dto.title ?? dto.name ?? "",
             posterPath: dto.posterPath
         )
     }

@@ -20,24 +20,19 @@ final class DefaultMovieRepository: MovieRepository {
         section: MovieSection,
         page: Int
     ) async throws -> MoviesPage {
-
         let response = try await networkClient.request(
             endpoint(for: section, page: page)
         )
-
-        return MoviesPage(
-            page: response.page,
-            totalPages: response.totalPages,
-            movies: response.results.map(makeMovie)
-        )
+        return response.toDomain()
     }
+
     func fetchMovieDetails(movieId: Int) async throws -> MovieSummary {
         let response = try await networkClient.request(
             MovieEndpoints.details(movieId: movieId)
         )
-
-        return makeMovie(from: response)
+        return response.toDomain()
     }
+
     // MARK: - Helpers
 
     private func endpoint(
@@ -54,16 +49,5 @@ final class DefaultMovieRepository: MovieRepository {
         case .upcoming:
             MovieEndpoints.upcoming(page: page)
         }
-    }
-
-    private func makeMovie(from dto: MovieDTO) -> MovieSummary {
-        MovieSummary(
-            id: dto.id,
-            title: dto.title,
-            overview: dto.overview,
-            posterPath: dto.posterPath,
-            backdropPath: dto.backdropPath,
-            rating: dto.voteAverage
-        )
     }
 }

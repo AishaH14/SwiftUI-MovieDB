@@ -11,11 +11,16 @@ import Foundation
 final class MovieDIContainer {
 
     private let movieRepository: any MovieRepository
+    private let accountRepository: any AccountRepository
 
-    init(networkClient: any NetworkClient) {
+    init(
+        networkClient: any NetworkClient,
+        accountRepository: any AccountRepository
+    ) {
         self.movieRepository = DefaultMovieRepository(
             networkClient: networkClient
         )
+        self.accountRepository = accountRepository
     }
 
     // MARK: - Use Cases
@@ -25,7 +30,19 @@ final class MovieDIContainer {
             movieRepository: movieRepository
         )
     }
-    
+
+    func makeFetchMovieDetailsUseCase() -> any FetchMovieDetailsUseCase {
+        DefaultFetchMovieDetailsUseCase(
+            movieRepository: movieRepository
+        )
+    }
+
+    func makeMovieUserStateUseCase() -> any MovieUserStateUseCase {
+        DefaultMovieUserStateUseCase(
+            accountRepository: accountRepository
+        )
+    }
+
     // MARK: - ViewModels
 
     @MainActor
@@ -34,18 +51,13 @@ final class MovieDIContainer {
             fetchMoviesUseCase: makeFetchMoviesUseCase()
         )
     }
-    
-    func makeFetchMovieDetailsUseCase() -> any FetchMovieDetailsUseCase {
-        DefaultFetchMovieDetailsUseCase(
-            movieRepository: movieRepository
-        )
-    }
 
     @MainActor
     func makeMovieDetailsViewModel(movieId: Int) -> MovieDetailsViewModel {
         MovieDetailsViewModel(
             movieId: movieId,
-            fetchMovieDetailsUseCase: makeFetchMovieDetailsUseCase()
+            fetchMovieDetailsUseCase: makeFetchMovieDetailsUseCase(),
+            movieUserStateUseCase: makeMovieUserStateUseCase()
         )
     }
 }

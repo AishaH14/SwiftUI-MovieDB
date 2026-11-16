@@ -43,11 +43,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // MARK: - Home Dependencies
 
         let movieStore = MovieStore.shared
-        let movieContainer = MovieDIContainer(
+        let accountRepository = DefaultAccountRepository(
             networkClient: networkClient
         )
+        let movieContainer = MovieDIContainer(
+            networkClient: networkClient,
+            accountRepository: accountRepository
+        )
         let profileContainer = ProfileDIContainer(
-            networkClient: networkClient
+            networkClient: networkClient,
+            accountRepository: accountRepository
         )
 
         let rootView = AppRootView(
@@ -62,6 +67,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             },
             makeSelectListViewModel: { movieId, sessionId in
                 profileContainer.makeSelectListViewModel(movieId: movieId, sessionId: sessionId)
+            },
+            makeMediaListViewModel: { source, sessionId in
+                profileContainer.makeMediaListViewModel(source: source, sessionId: sessionId)
             }
         )
         .environmentObject(

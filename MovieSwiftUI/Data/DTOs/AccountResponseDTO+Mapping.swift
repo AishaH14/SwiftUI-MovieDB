@@ -1,5 +1,5 @@
 //
-//  AccountResponseDTO.swift
+//  AccountResponseDTO+Mapping.swift
 //  MovieSwiftUI
 //
 //  Created by Aisha Hudasi on 30/05/1448 AH.
@@ -20,5 +20,15 @@ struct AccountResponseDTO: Decodable {
 
     struct TMDBAvatarDTO: Decodable {
         let avatarPath: String?
+    }
+}
+
+extension AccountResponseDTO {
+    func toDomain() -> Account {
+        Account(
+            id: id,
+            username: username,
+            avatarPath: avatar?.tmdb?.avatarPath
+        )
     }
 }

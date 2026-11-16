@@ -12,62 +12,70 @@ final class ProfileDIContainer {
     private let accountRepository: any AccountRepository
     private let listRepository: any ListRepository
     
-    init(networkClient: any NetworkClient) {
-        self.accountRepository = DefaultAccountRepository(
-            networkClient: networkClient
-        )
+    init(
+        networkClient: any NetworkClient,
+        accountRepository: any AccountRepository
+    ) {
+        self.accountRepository = accountRepository
         self.listRepository = DefaultListRepository(
             networkClient: networkClient
         )
     }
     
     // MARK: - Use Cases
-    
+
     func makeFetchAccountUseCase() -> any FetchAccountUseCase {
         DefaultFetchAccountUseCase(
             accountRepository: accountRepository
         )
     }
-    
+
     func makeFetchListsUseCase() -> any FetchListsUseCase {
         DefaultFetchListsUseCase(
             accountRepository: accountRepository,
             listRepository: listRepository
         )
     }
-    
+
     func makeCreateListUseCase() -> any CreateListUseCase {
         DefaultCreateListUseCase(
             listRepository: listRepository
         )
     }
-    
+
     func makeDeleteListUseCase() -> any DeleteListUseCase {
         DefaultDeleteListUseCase(
             listRepository: listRepository
         )
     }
-    
+
     func makeFetchListDetailsUseCase() -> any FetchListDetailsUseCase {
         DefaultFetchListDetailsUseCase(
             listRepository: listRepository
         )
     }
-    
+
     func makeListMoviesUseCase() -> any ListMoviesUseCase {
         DefaultListMoviesUseCase(
             listRepository: listRepository
         )
     }
+
+    func makeMovieUserStateUseCase() -> any MovieUserStateUseCase {
+        DefaultMovieUserStateUseCase(
+            accountRepository: accountRepository
+        )
+    }
+
     // MARK: - ViewModels
-    
+
     @MainActor
     func makeProfileViewModel() -> ProfileViewModel {
         ProfileViewModel(
             fetchAccountUseCase: makeFetchAccountUseCase()
         )
     }
-    
+
     @MainActor
     func makeListsViewModel(sessionId: String) -> ListsViewModel {
         ListsViewModel(
@@ -77,12 +85,12 @@ final class ProfileDIContainer {
             makeCreateListViewModel: { [unowned self] in
                 self.makeCreateListViewModel(sessionId: sessionId)
             },
-            makeListDetailsViewModel: { [unowned self] listId in
-                self.makeListDetailsViewModel(listId: listId)
+            makeMediaListViewModel: { [unowned self] list in
+                self.makeMediaListViewModel(source: .list(list), sessionId: sessionId)
             }
         )
     }
-    
+
     @MainActor
     func makeCreateListViewModel(sessionId: String) -> CreateListViewModel {
         CreateListViewModel(
@@ -92,13 +100,16 @@ final class ProfileDIContainer {
     }
 
     @MainActor
-    func makeListDetailsViewModel(listId: Int) -> ListDetailsViewModel {
-        ListDetailsViewModel(
-            listId: listId,
-            fetchListDetailsUseCase: makeFetchListDetailsUseCase()
+    func makeMediaListViewModel(source: MediaListSource, sessionId: String) -> MediaListViewModel {
+        MediaListViewModel(
+            source: source,
+            sessionId: sessionId,
+            fetchListDetailsUseCase: makeFetchListDetailsUseCase(),
+            listMoviesUseCase: makeListMoviesUseCase(),
+            movieUserStateUseCase: makeMovieUserStateUseCase()
         )
     }
-    
+
     @MainActor
     func makeSelectListViewModel(movieId: Int, sessionId: String) -> SelectListViewModel {
         SelectListViewModel(

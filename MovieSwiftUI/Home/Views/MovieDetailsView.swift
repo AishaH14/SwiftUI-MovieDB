@@ -39,13 +39,22 @@ struct MovieDetailsView: View {
             .navigationDestination(isPresented: $isShowingSignIn) {
                 SignInPromptView(
                     authViewModel: authViewModel,
-                    navigationTitle: "My Lists",
-                    title: "Sign in to use My Lists",
-                    message: "Sign in to TMDB to add movies to your lists."
+                    navigationTitle: "Sign In",
+                    title: "Sign in to save movies",
+                    message: "Sign in to TMDB to add movies to your favorites, watchlist and lists."
                 )
+            }
+            .alert("Error", isPresented: isShowingError) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text(viewModel.errorMessage ?? "")
             }
             .task {
                 await viewModel.loadDetails()
+            }
+            .task(id: authViewModel.sessionId) {
+                guard let sessionId = authViewModel.sessionId else { return }
+                await viewModel.loadUserState(sessionId: sessionId)
             }
     }
 
@@ -119,27 +128,64 @@ struct MovieDetailsView: View {
         .clipped()
     }
 
+    // MARK: - Action Buttons
+
     private var actionButtons: some View {
         HStack {
-            MovieActionButton(title: "Add Watchlist", systemImage: "bookmark")
-            MovieActionButton(title: "Add Favorite", systemImage: "heart")
-
-            Button {
-                if authViewModel.isSignedIn {
-                    isShowingSelectList = true
-                } else {
-                    isShowingSignIn = true
+            MovieActionButton(
+                title: viewModel.isInWatchlist ? "Added Watchlist" : "Add Watchlist",
+                systemImage: viewModel.isInWatchlist ? "checkmark" : "bookmark",
+                color: viewModel.isInWatchlist ? .green : .gray
+            ) {
+                performIfSignedIn { sessionId in
+                    await viewModel.toggleWatchlist(sessionId: sessionId)
                 }
-            } label: {
-                MovieActionLabel(title: "Add to List", systemImage: "text.badge.plus")
             }
-            .foregroundStyle(Color.gray)
+            .disabled(viewModel.isUpdatingWatchlist)
+
+            MovieActionButton(
+                title: viewModel.isFavorite ? "Added Favorite" : "Add Favorite",
+                systemImage: viewModel.isFavorite ? "heart.fill" : "heart",
+                color: .red
+            ) {
+                performIfSignedIn { sessionId in
+                    await viewModel.toggleFavorite(sessionId: sessionId)
+                }
+            }
+            .disabled(viewModel.isUpdatingFavorite)
+
+            MovieActionButton(
+                title: "Add to List",
+                systemImage: "text.badge.plus",
+                color: .gray
+            ) {
+                performIfSignedIn { _ in
+                    isShowingSelectList = true
+                }
+            }
         }
+    }
+    
+    private func performIfSignedIn(_ action: @escaping (String) async -> Void) {
+        guard let sessionId = authViewModel.sessionId else {
+            isShowingSignIn = true
+            return
+        }
+        Task { await action(sessionId) }
     }
 
     private func backdropURL(for movie: MovieSummary) -> URL? {
         guard let posterPath = movie.posterPath else { return nil }
         return URL(string: "https://image.tmdb.org/t/p/w780\(posterPath)")
+    }
+
+    // MARK: - Alerts
+
+    private var isShowingError: Binding<Bool> {
+        Binding(
+            get: { viewModel.errorMessage != nil },
+            set: { if !$0 { viewModel.errorMessage = nil } }
+        )
     }
 }
 
@@ -149,35 +195,20 @@ private struct MovieActionButton: View {
 
     let title: String
     let systemImage: String
-
-    @State private var isSelected = false
-
-    var body: some View {
-        Button {
-            isSelected.toggle()
-        } label: {
-            MovieActionLabel(
-                title: title,
-                systemImage: isSelected ? "checkmark" : systemImage
-            )
-        }
-        .foregroundStyle(isSelected ? Color.green : Color.gray)
-    }
-}
-
-private struct MovieActionLabel: View {
-
-    let title: String
-    let systemImage: String
+    let color: Color
+    let action: () -> Void
 
     var body: some View {
-        VStack(spacing: 6) {
-            Image(systemName: systemImage)
-                .font(.title3)
+        Button(action: action) {
+            VStack(spacing: 6) {
+                Image(systemName: systemImage)
+                    .font(.title3)
 
-            Text(title)
-                .font(.caption)
+                Text(title)
+                    .font(.caption)
+            }
+            .frame(maxWidth: .infinity)
         }
-        .frame(maxWidth: .infinity)
+        .foregroundStyle(color)
     }
 }

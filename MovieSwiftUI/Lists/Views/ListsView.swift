@@ -108,8 +108,8 @@ struct ListsView: View {
             List {
                 ForEach(viewModel.lists) { list in
                     NavigationLink {
-                        ListDetailsView(
-                            viewModel: viewModel.makeListDetailsViewModel(listId: list.id)
+                        MediaListView(
+                            viewModel: viewModel.makeMediaListViewModel(list: list)
                         )
                     } label: {
                         ListRowView(list: list)
