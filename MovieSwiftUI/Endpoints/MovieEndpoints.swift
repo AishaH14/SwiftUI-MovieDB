@@ -34,9 +34,7 @@ enum MovieEndpoints {
     ) -> APIEndpoint<MovieResponseDTO> {
         APIEndpoint(
             path: path,
-            queryItems: [
-                URLQueryItem(name: "page", value: String(page))
-            ]
+            queryItems: [.page(page)]
         )
     }
 }

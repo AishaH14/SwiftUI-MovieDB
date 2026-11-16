@@ -13,16 +13,25 @@ struct AppRootView: View {
 
     @State private var authViewModel: AuthViewModel
     private let homeViewModel: HomeViewModel
+    private let profileViewModel: ProfileViewModel
     private let makeMovieDetailsViewModel: (Int) -> MovieDetailsViewModel
+    private let makeListsViewModel: (String) -> ListsViewModel
+    private let makeSelectListViewModel: (Int, String) -> SelectListViewModel
 
     init(
         authViewModel: AuthViewModel,
         homeViewModel: HomeViewModel,
-        makeMovieDetailsViewModel: @escaping (Int) -> MovieDetailsViewModel
+        profileViewModel: ProfileViewModel,
+        makeMovieDetailsViewModel: @escaping (Int) -> MovieDetailsViewModel,
+        makeListsViewModel: @escaping (String) -> ListsViewModel,
+        makeSelectListViewModel: @escaping (Int, String) -> SelectListViewModel
     ) {
         _authViewModel = State(initialValue: authViewModel)
         self.homeViewModel = homeViewModel
+        self.profileViewModel = profileViewModel
         self.makeMovieDetailsViewModel = makeMovieDetailsViewModel
+        self.makeListsViewModel = makeListsViewModel
+        self.makeSelectListViewModel = makeSelectListViewModel
     }
 
     var body: some View {
@@ -33,9 +42,13 @@ struct AppRootView: View {
                 WelcomeView(authViewModel: authViewModel)
 
             case .guest, .signedIn:
-                HomeView(
-                    viewModel: homeViewModel,
-                    makeMovieDetailsViewModel: makeMovieDetailsViewModel
+                MainTabView(
+                    homeViewModel: homeViewModel,
+                    profileViewModel: profileViewModel,
+                    authViewModel: authViewModel,
+                    makeMovieDetailsViewModel: makeMovieDetailsViewModel,
+                    makeListsViewModel: makeListsViewModel,
+                    makeSelectListViewModel: makeSelectListViewModel
                 )
             }
         }

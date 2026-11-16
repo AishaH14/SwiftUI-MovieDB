@@ -13,7 +13,7 @@ import Foundation
 final class AuthDIContainer {
 
     private let authRepository: any AuthRepository
-
+    private let authSessionStorage: any AuthSessionStorage = KeychainAuthSessionStorage()
     init(networkClient: any NetworkClient) {
         self.authRepository = DefaultAuthRepository(
             networkClient: networkClient
@@ -47,7 +47,8 @@ final class AuthDIContainer {
         AuthViewModel(
             createGuestSessionUseCase: makeGuestSessionUseCase(),
             createRequestTokenUseCase: makeRequestTokenUseCase(),
-            createSessionUseCase: makeCreateSessionUseCase()
+            createSessionUseCase: makeCreateSessionUseCase(),
+            authSessionStorage: authSessionStorage
         )
     }
-}
+    }

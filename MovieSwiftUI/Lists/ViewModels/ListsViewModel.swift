@@ -1,0 +1,125 @@
+//
+//  ListsViewModel.swift
+//  MovieSwiftUI
+//
+//  Created by Aisha Hudasi on 01/06/1448 AH.
+//  Copyright © 1448 AH Alfian Losari. All rights reserved.
+//
+import Foundation
+import Observation
+
+@MainActor
+@Observable
+final class ListsViewModel {
+
+    enum State {
+        case loading
+        case loaded
+        case failed(String)
+    }
+
+    private let sessionId: String
+    private let fetchListsUseCase: any FetchListsUseCase
+    private let deleteListUseCase: any DeleteListUseCase
+    private let createListViewModelFactory: () -> CreateListViewModel
+    private let listDetailsViewModelFactory: (Int) -> ListDetailsViewModel
+    
+    private(set) var state: State = .loading
+    private(set) var lists: [MovieList] = []
+    private(set) var isLoadingNextPage = false
+    var errorMessage: String?
+
+    private var currentPage = 0
+    private var totalPages = 1
+
+    init(
+        sessionId: String,
+        fetchListsUseCase: any FetchListsUseCase,
+        deleteListUseCase: any DeleteListUseCase,
+        makeCreateListViewModel: @escaping () -> CreateListViewModel,
+        makeListDetailsViewModel: @escaping (Int) -> ListDetailsViewModel
+    ) {
+        self.sessionId = sessionId
+        self.fetchListsUseCase = fetchListsUseCase
+        self.deleteListUseCase = deleteListUseCase
+        self.createListViewModelFactory = makeCreateListViewModel
+        self.listDetailsViewModelFactory = makeListDetailsViewModel
+    }
+
+    func makeCreateListViewModel() -> CreateListViewModel {
+        createListViewModelFactory()
+    }
+
+    func makeListDetailsViewModel(listId: Int) -> ListDetailsViewModel {
+        listDetailsViewModelFactory(listId)
+    }
+    // MARK: - Loading
+
+    // MARK: - Loading
+
+    func loadFirstPage() async {
+        state = .loading
+        currentPage = 0
+        totalPages = 1
+
+        do {
+            let page = try await fetchListsUseCase.execute(
+                sessionId: sessionId,
+                page: 1
+            )
+            lists = page.lists
+            currentPage = page.page
+            totalPages = page.totalPages
+            state = .loaded
+        } catch {
+            guard !error.isCancellation else { return }
+            state = .failed(message(for: error, fallback: "Failed loading lists"))
+        }
+    }
+
+    func loadNextPageIfNeeded(currentList: MovieList) async {
+        guard currentList.id == lists.last?.id,
+              currentPage < totalPages,
+              !isLoadingNextPage else { return }
+
+        isLoadingNextPage = true
+        defer { isLoadingNextPage = false }
+
+        do {
+            let page = try await fetchListsUseCase.execute(
+                sessionId: sessionId,
+                page: currentPage + 1
+            )
+            lists.append(contentsOf: page.lists)
+            currentPage = page.page
+            totalPages = page.totalPages
+        } catch {
+            guard !error.isCancellation else { return }
+            errorMessage = message(for: error, fallback: "Failed loading more lists")
+        }
+    }
+
+    // MARK: - Delete
+
+    func deleteList(_ list: MovieList) async {
+        do {
+            try await deleteListUseCase.execute(
+                listId: list.id,
+                sessionId: sessionId
+            )
+            lists.removeAll { $0.id == list.id }
+        } catch {
+            await loadFirstPage()
+
+            if lists.contains(where: { $0.id == list.id }) {
+                errorMessage = message(for: error, fallback: "Failed deleting the list")
+            }
+        }
+    }
+
+    // MARK: - Error Handling
+
+    private func message(for error: Error, fallback: String) -> String {
+        error.isInternetConnectionError ? "No internet connection" : fallback
+    }
+}

@@ -1,0 +1,138 @@
+//
+//  DefaultListRepository.swift
+//  MovieSwiftUI
+//
+//  Created by Aisha Hudasi on 01/06/1448 AH.
+//  Copyright © 1448 AH Alfian Losari. All rights reserved.
+//
+
+import Foundation
+
+final class DefaultListRepository: ListRepository {
+
+    private let networkClient: any NetworkClient
+
+    init(networkClient: any NetworkClient) {
+        self.networkClient = networkClient
+    }
+
+    func fetchLists(
+        accountId: Int,
+        sessionId: String,
+        page: Int
+    ) async throws -> MovieListsPage {
+
+        let response = try await networkClient.request(
+            ListEndpoints.accountLists(
+                accountId: accountId,
+                sessionId: sessionId,
+                page: page
+            )
+        )
+
+        return MovieListsPage(
+            page: response.page,
+            totalPages: response.totalPages,
+            lists: response.results.map(makeList)
+        )
+    }
+    func createList(
+        sessionId: String,
+        name: String,
+        description: String
+    ) async throws -> Int {
+
+        let response = try await networkClient.request(
+            ListEndpoints.createList(
+                sessionId: sessionId,
+                request: CreateListRequestDTO(
+                    name: name,
+                    description: description,
+                    language: "en"
+                )
+            )
+        )
+
+        guard response.success else {
+            throw ListRepositoryError.createFailed
+        }
+
+        return response.listId
+    }
+    func deleteList(listId: Int, sessionId: String) async throws {
+        _ = try await networkClient.request(
+            ListEndpoints.deleteList(
+                listId: listId,
+                sessionId: sessionId
+            )
+        )
+    }
+    func fetchListDetails(listId: Int) async throws -> ListDetails {
+        let response = try await networkClient.request(
+            ListEndpoints.listDetails(listId: listId)
+        )
+
+        return ListDetails(
+            id: response.id,
+            name: response.name,
+            itemCount: response.itemCount,
+            items: response.items.map(makeListItem)
+        )
+    }
+    func addMovieToList(
+        listId: Int,
+        sessionId: String,
+        movieId: Int
+    ) async throws {
+        _ = try await networkClient.request(
+            ListEndpoints.addMovieToList(
+                listId: listId,
+                sessionId: sessionId,
+                request: ListItemRequestDTO(mediaId: movieId)
+            )
+        )
+    }
+
+    func removeMovieFromList(
+        listId: Int,
+        sessionId: String,
+        movieId: Int
+    ) async throws {
+        _ = try await networkClient.request(
+            ListEndpoints.removeMovieFromList(
+                listId: listId,
+                sessionId: sessionId,
+                request: ListItemRequestDTO(mediaId: movieId)
+            )
+        )
+    }
+
+    func isMovieInList(
+        listId: Int,
+        movieId: Int
+    ) async throws -> Bool {
+        let response = try await networkClient.request(
+            ListEndpoints.itemStatus(listId: listId, movieId: movieId)
+        )
+        return response.itemPresent
+    }
+    // MARK: - Helpers
+
+    private func makeList(from dto: ListDTO) -> MovieList {
+        MovieList(
+            id: dto.id,
+            name: dto.name,
+            description: dto.description ?? "",
+            itemCount: dto.itemCount,
+            posterPath: dto.posterPath
+        )
+    }
+    
+    private func makeListItem(from dto: ListItemDTO) -> ListItem {
+        ListItem(
+            id: dto.id,
+            title: dto.title ?? dto.name ?? "",
+            posterPath: dto.posterPath
+        )
+    }
+}

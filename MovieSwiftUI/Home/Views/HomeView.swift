@@ -11,16 +11,21 @@ import SwiftUI
 struct HomeView: View {
 
     @State private var viewModel: HomeViewModel
+    private let authViewModel: AuthViewModel
     private let makeMovieDetailsViewModel: (Int) -> MovieDetailsViewModel
+    private let makeSelectListViewModel: (Int, String) -> SelectListViewModel
 
     init(
         viewModel: HomeViewModel,
-        makeMovieDetailsViewModel: @escaping (Int) -> MovieDetailsViewModel
+        authViewModel: AuthViewModel,
+        makeMovieDetailsViewModel: @escaping (Int) -> MovieDetailsViewModel,
+        makeSelectListViewModel: @escaping (Int, String) -> SelectListViewModel
     ) {
         _viewModel = State(initialValue: viewModel)
+        self.authViewModel = authViewModel
         self.makeMovieDetailsViewModel = makeMovieDetailsViewModel
+        self.makeSelectListViewModel = makeSelectListViewModel
     }
-    
 
     var body: some View {
         NavigationStack {
@@ -39,16 +44,17 @@ struct HomeView: View {
                     }
                 }
                 .padding(.vertical)
-               
             }
             .refreshable {
                 await viewModel.loadMovies()
             }
             .navigationTitle("Home")
             .navigationBarTitleDisplayMode(.inline)
-            .navigationDestination(for: MovieSummary.self) { movie in
+            .navigationDestination(for: MovieCardItemViewModel.self) { item in
                 MovieDetailsView(
-                    viewModel: makeMovieDetailsViewModel(movie.id)
+                    viewModel: makeMovieDetailsViewModel(item.id),
+                    authViewModel: authViewModel,
+                    makeSelectListViewModel: makeSelectListViewModel
                 )
             }
         }

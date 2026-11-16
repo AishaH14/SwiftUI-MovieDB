@@ -10,18 +10,13 @@ import SwiftUI
 
 struct MovieCardView: View {
 
-    let movie: MovieSummary
-
-    private var posterURL: URL? {
-        guard let posterPath = movie.posterPath else { return nil }
-        return URL(string: "https://image.tmdb.org/t/p/w342\(posterPath)")
-    }
+    let item: MovieCardItemViewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             poster
 
-            Text(movie.title)
+            Text(item.title)
                 .font(.subheadline)
                 .foregroundStyle(.primary)
                 .lineLimit(2)
@@ -31,7 +26,7 @@ struct MovieCardView: View {
                 Image(systemName: "star.fill")
                     .foregroundStyle(.orange)
 
-                Text(movie.rating, format: .number.precision(.fractionLength(1)))
+                Text(item.rating)
                     .foregroundStyle(.primary)
             }
             .font(.caption)
@@ -40,7 +35,7 @@ struct MovieCardView: View {
     }
 
     private var poster: some View {
-        AsyncImage(url: posterURL) { phase in
+        AsyncImage(url: item.posterURL) { phase in
             switch phase {
             case .success(let image):
                 image
@@ -63,13 +58,11 @@ struct MovieCardView: View {
 
 #Preview {
     MovieCardView(
-        movie: MovieSummary(
+        item: MovieCardItemViewModel(
             id: 1,
             title: "The Dark Knight",
-            overview: "",
-            posterPath: nil,
-            backdropPath: nil,
-            rating: 8.5
+            posterURL: nil,
+            rating: "8.5"
         )
     )
 }
