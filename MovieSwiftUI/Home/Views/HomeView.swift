@@ -11,64 +11,33 @@ import SwiftUI
 struct HomeView: View {
 
     @State private var viewModel: HomeViewModel
-    private let authViewModel: AuthViewModel
-    private let makeMovieDetailsViewModel: (Int) -> MovieDetailsViewModel
-    private let makeSelectListViewModel: (Int, String) -> SelectListViewModel
-    private let makeMoviesListViewModel: (MoviesListSource) -> MoviesListViewModel
 
-    init(
-        viewModel: HomeViewModel,
-        authViewModel: AuthViewModel,
-        makeMovieDetailsViewModel: @escaping (Int) -> MovieDetailsViewModel,
-        makeSelectListViewModel: @escaping (Int, String) -> SelectListViewModel,
-        makeMoviesListViewModel: @escaping (MoviesListSource) -> MoviesListViewModel
-    ) {
+    init(viewModel: HomeViewModel) {
         _viewModel = State(initialValue: viewModel)
-        self.authViewModel = authViewModel
-        self.makeMovieDetailsViewModel = makeMovieDetailsViewModel
-        self.makeSelectListViewModel = makeSelectListViewModel
-        self.makeMoviesListViewModel = makeMoviesListViewModel
     }
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: 24) {
-                    ForEach(MovieSection.allCases) { section in
-                        MovieSectionView(
-                            section: section,
-                            state: viewModel.state(for: section),
-                            onRetry: {
-                                Task {
-                                    await viewModel.loadMovies(for: section)
-                                }
+        ScrollView {
+            LazyVStack(alignment: .leading, spacing: 24) {
+                ForEach(MovieSection.allCases) { section in
+                    MovieSectionView(
+                        section: section,
+                        state: viewModel.state(for: section),
+                        onRetry: {
+                            Task {
+                                await viewModel.loadMovies(for: section)
                             }
-                        )
-                    }
+                        }
+                    )
                 }
-                .padding(.vertical)
             }
-            .refreshable {
-                await viewModel.loadMovies()
-            }
-            .navigationTitle("Home")
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationDestination(for: MovieCardItemViewModel.self) { item in
-                MovieDetailsView(
-                    viewModel: makeMovieDetailsViewModel(item.id),
-                    authViewModel: authViewModel,
-                    makeSelectListViewModel: makeSelectListViewModel
-                )
-            }
-            .navigationDestination(for: MovieSection.self) { section in
-                MoviesListView(
-                    viewModel: makeMoviesListViewModel(.section(section)),
-                    authViewModel: authViewModel,
-                    makeMovieDetailsViewModel: makeMovieDetailsViewModel,
-                    makeSelectListViewModel: makeSelectListViewModel
-                )
-            }
+            .padding(.vertical)
         }
+        .refreshable {
+            await viewModel.loadMovies()
+        }
+        .navigationTitle("Home")
+        .navigationBarTitleDisplayMode(.inline)
         .task {
             await viewModel.loadMovies()
         }

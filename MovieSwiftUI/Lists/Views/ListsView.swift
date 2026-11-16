@@ -107,11 +107,7 @@ struct ListsView: View {
         case .loaded:
             List {
                 ForEach(viewModel.lists) { list in
-                    NavigationLink {
-                        MediaListView(
-                            viewModel: viewModel.makeMediaListViewModel(list: list)
-                        )
-                    } label: {
+                    NavigationLink(value: Route.mediaList(.list(list))) {
                         ListRowView(list: list)
                     }
                         .swipeActions(edge: .trailing, allowsFullSwipe: false) {

@@ -22,7 +22,6 @@ final class ListsViewModel {
     private let fetchListsUseCase: any FetchListsUseCase
     private let deleteListUseCase: any DeleteListUseCase
     private let createListViewModelFactory: () -> CreateListViewModel
-    private let mediaListViewModelFactory: (MovieList) -> MediaListViewModel
     
     private(set) var state: State = .loading
     private(set) var lists: [MovieList] = []
@@ -36,22 +35,16 @@ final class ListsViewModel {
         sessionId: String,
         fetchListsUseCase: any FetchListsUseCase,
         deleteListUseCase: any DeleteListUseCase,
-        makeCreateListViewModel: @escaping () -> CreateListViewModel,
-        makeMediaListViewModel: @escaping (MovieList) -> MediaListViewModel
+        makeCreateListViewModel: @escaping () -> CreateListViewModel
     ) {
         self.sessionId = sessionId
         self.fetchListsUseCase = fetchListsUseCase
         self.deleteListUseCase = deleteListUseCase
         self.createListViewModelFactory = makeCreateListViewModel
-        self.mediaListViewModelFactory = makeMediaListViewModel
     }
 
     func makeCreateListViewModel() -> CreateListViewModel {
         createListViewModelFactory()
-    }
-
-    func makeMediaListViewModel(list: MovieList) -> MediaListViewModel {
-        mediaListViewModelFactory(list)
     }
 
     // MARK: - Loading

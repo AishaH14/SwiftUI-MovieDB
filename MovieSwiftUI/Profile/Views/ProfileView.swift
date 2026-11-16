@@ -12,35 +12,23 @@ struct ProfileView: View {
 
     @State private var viewModel: ProfileViewModel
     private let authViewModel: AuthViewModel
-    private let makeListsViewModel: (String) -> ListsViewModel
-    private let makeMediaListViewModel: (MediaListSource, String) -> MediaListViewModel
 
-    init(
-        viewModel: ProfileViewModel,
-        authViewModel: AuthViewModel,
-        makeListsViewModel: @escaping (String) -> ListsViewModel,
-        makeMediaListViewModel: @escaping (MediaListSource, String) -> MediaListViewModel
-    ) {
+    init(viewModel: ProfileViewModel, authViewModel: AuthViewModel) {
         _viewModel = State(initialValue: viewModel)
         self.authViewModel = authViewModel
-        self.makeListsViewModel = makeListsViewModel
-        self.makeMediaListViewModel = makeMediaListViewModel
     }
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(spacing: 16) {
-                    header
-                    rows
-                }
-                .padding()
+        ScrollView {
+            VStack(spacing: 16) {
+                header
+                rows
             }
-            .background(Color(.systemGroupedBackground))
-            .navigationTitle("Profile")
-            .navigationBarTitleDisplayMode(.inline)
+            .padding()
         }
-        
+        .background(Color(.systemGroupedBackground))
+        .navigationTitle("Profile")
+        .navigationBarTitleDisplayMode(.inline)
         .task(id: authViewModel.isSignedIn) {
             await viewModel.load(authState: authViewModel.authState)
         }
@@ -60,6 +48,14 @@ struct ProfileView: View {
                     Text("Not signed in to TMDB")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
+
+                    NavigationLink(value: Route.signIn(.account)) {
+                        Text("Sign In")
+                            .font(.subheadline.weight(.semibold))
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .padding(.top, 4)
                 }
 
             case .loading:
@@ -136,74 +132,41 @@ struct ProfileView: View {
         .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
-    @ViewBuilder
     private var listsRow: some View {
-        if let sessionId {
-            NavigationLink {
-                ListsView(viewModel: makeListsViewModel(sessionId))
-            } label: {
-                ProfileRowLabel(title: "Lists", systemImage: "list.bullet.rectangle")
-            }
-        } else {
-            guestRow(
-                title: "Lists",
-                navigationTitle: "My Lists",
-                systemImage: "list.bullet.rectangle",
-                message: "Sign in to TMDB to create and manage your lists."
-            )
-        }
+        row(
+            title: "Lists",
+            systemImage: "list.bullet.rectangle",
+            route: .lists,
+            guestPrompt: .lists
+        )
     }
 
-    @ViewBuilder
     private var favoritesRow: some View {
-        if let sessionId {
-            NavigationLink {
-                MediaListView(viewModel: makeMediaListViewModel(.favorites, sessionId))
-            } label: {
-                ProfileRowLabel(title: "Favorites", systemImage: "heart")
-            }
-        } else {
-            guestRow(
-                title: "Favorites",
-                navigationTitle: "Favorites",
-                systemImage: "heart",
-                message: "Sign in to TMDB to save your favorite movies."
-            )
-        }
+        row(
+            title: "Favorites",
+            systemImage: "heart",
+            route: .mediaList(.favorites),
+            guestPrompt: .favorites
+        )
     }
 
-    @ViewBuilder
     private var watchlistRow: some View {
-        if let sessionId {
-            NavigationLink {
-                MediaListView(viewModel: makeMediaListViewModel(.watchlist, sessionId))
-            } label: {
-                ProfileRowLabel(title: "Watchlist", systemImage: "bookmark")
-            }
-        } else {
-            guestRow(
-                title: "Watchlist",
-                navigationTitle: "Watchlist",
-                systemImage: "bookmark",
-                message: "Sign in to TMDB to keep track of movies you want to watch."
-            )
-        }
+        row(
+            title: "Watchlist",
+            systemImage: "bookmark",
+            route: .mediaList(.watchlist),
+            guestPrompt: .watchlist
+        )
     }
 
-    private func guestRow(
+    /// Signed-in users open the page, guests open the sign-in page.
+    private func row(
         title: String,
-        navigationTitle: String,
         systemImage: String,
-        message: String
+        route: Route,
+        guestPrompt: SignInPrompt
     ) -> some View {
-        NavigationLink {
-            SignInPromptView(
-                authViewModel: authViewModel,
-                navigationTitle: navigationTitle,
-                title: "Sign in to use \(navigationTitle)",
-                message: message
-            )
-        } label: {
+        NavigationLink(value: sessionId == nil ? .signIn(guestPrompt) : route) {
             ProfileRowLabel(title: title, systemImage: systemImage)
         }
     }

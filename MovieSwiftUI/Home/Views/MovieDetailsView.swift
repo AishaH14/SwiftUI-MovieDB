@@ -12,7 +12,7 @@ struct MovieDetailsView: View {
 
     @State private var viewModel: MovieDetailsViewModel
     @State private var isShowingSelectList = false
-    @State private var isShowingSignIn = false
+    @Environment(Router.self) private var router
     private let authViewModel: AuthViewModel
     private let makeSelectListViewModel: (Int, String) -> SelectListViewModel
 
@@ -35,14 +35,6 @@ struct MovieDetailsView: View {
                         viewModel: makeSelectListViewModel(viewModel.movieId, sessionId)
                     )
                 }
-            }
-            .navigationDestination(isPresented: $isShowingSignIn) {
-                SignInPromptView(
-                    authViewModel: authViewModel,
-                    navigationTitle: "Sign In",
-                    title: "Sign in to save movies",
-                    message: "Sign in to TMDB to add movies to your favorites, watchlist and lists."
-                )
             }
             .alert("Error", isPresented: isShowingError) {
                 Button("OK", role: .cancel) { }
@@ -168,7 +160,7 @@ struct MovieDetailsView: View {
     
     private func performIfSignedIn(_ action: @escaping (String) async -> Void) {
         guard let sessionId = authViewModel.sessionId else {
-            isShowingSignIn = true
+            router.push(.signIn(.saveMovies))
             return
         }
         Task { await action(sessionId) }

@@ -28,7 +28,7 @@ struct MovieSectionView: View {
 
             Spacer()
 
-            NavigationLink(value: section) {
+            NavigationLink(value: Route.moviesList(.section(section))) {
                 Text("See All")
                     .font(.caption)
                     .foregroundStyle(Color.accentColor)
@@ -60,7 +60,7 @@ struct MovieSectionView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHStack(alignment: .top, spacing: 16) {
                     ForEach(items) { item in
-                        NavigationLink(value: item) {
+                        NavigationLink(value: Route.movieDetails(movieId: item.id)) {
                             MovieCardView(item: item)
                         }
                         .buttonStyle(.plain)

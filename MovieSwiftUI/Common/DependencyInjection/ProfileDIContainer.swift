@@ -84,9 +84,6 @@ final class ProfileDIContainer {
             deleteListUseCase: makeDeleteListUseCase(),
             makeCreateListViewModel: { [unowned self] in
                 self.makeCreateListViewModel(sessionId: sessionId)
-            },
-            makeMediaListViewModel: { [unowned self] list in
-                self.makeMediaListViewModel(source: .list(list), sessionId: sessionId)
             }
         )
     }

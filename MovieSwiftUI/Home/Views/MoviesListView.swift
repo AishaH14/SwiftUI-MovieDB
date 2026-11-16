@@ -11,33 +11,15 @@ import SwiftUI
 struct MoviesListView: View {
 
     @State private var viewModel: MoviesListViewModel
-    private let authViewModel: AuthViewModel
-    private let makeMovieDetailsViewModel: (Int) -> MovieDetailsViewModel
-    private let makeSelectListViewModel: (Int, String) -> SelectListViewModel
 
-    init(
-        viewModel: MoviesListViewModel,
-        authViewModel: AuthViewModel,
-        makeMovieDetailsViewModel: @escaping (Int) -> MovieDetailsViewModel,
-        makeSelectListViewModel: @escaping (Int, String) -> SelectListViewModel
-    ) {
+    init(viewModel: MoviesListViewModel) {
         _viewModel = State(initialValue: viewModel)
-        self.authViewModel = authViewModel
-        self.makeMovieDetailsViewModel = makeMovieDetailsViewModel
-        self.makeSelectListViewModel = makeSelectListViewModel
     }
 
     var body: some View {
         searchableContent
             .navigationTitle(viewModel.title)
             .navigationBarTitleDisplayMode(.inline)
-            .navigationDestination(for: MoviesListItemViewModel.self) { item in
-                MovieDetailsView(
-                    viewModel: makeMovieDetailsViewModel(item.id),
-                    authViewModel: authViewModel,
-                    makeSelectListViewModel: makeSelectListViewModel
-                )
-            }
             .alert("Error", isPresented: isShowingError) {
                 Button("OK", role: .cancel) { }
             } message: {
@@ -177,7 +159,7 @@ struct MoviesListView: View {
     @ViewBuilder
     private func row(for item: MoviesListItemViewModel) -> some View {
         if item.category == .movies {
-            NavigationLink(value: item) {
+            NavigationLink(value: Route.movieDetails(movieId: item.id)) {
                 MoviesListRow(item: item)
             }
         } else {

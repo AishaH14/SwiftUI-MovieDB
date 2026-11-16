@@ -10,50 +10,24 @@ import SwiftUI
 
 struct MainTabView: View {
 
-    let homeViewModel: HomeViewModel
-    let searchViewModel: MoviesListViewModel
-    let profileViewModel: ProfileViewModel
-    let authViewModel: AuthViewModel
-    let makeMovieDetailsViewModel: (Int) -> MovieDetailsViewModel
-    let makeListsViewModel: (String) -> ListsViewModel
-    let makeSelectListViewModel: (Int, String) -> SelectListViewModel
-    let makeMediaListViewModel: (MediaListSource, String) -> MediaListViewModel
-    let makeMoviesListViewModel: (MoviesListSource) -> MoviesListViewModel
+    let container: AppDIContainer
 
     var body: some View {
         TabView {
-            HomeView(
-                viewModel: homeViewModel,
-                authViewModel: authViewModel,
-                makeMovieDetailsViewModel: makeMovieDetailsViewModel,
-                makeSelectListViewModel: makeSelectListViewModel,
-                makeMoviesListViewModel: makeMoviesListViewModel
-            )
-            .tabItem {
-                Label("Home", systemImage: "house")
-            }
+            HomeFlowCoordinator(container: container)
+                .tabItem {
+                    Label("Home", systemImage: "house")
+                }
 
-            NavigationStack {
-                MoviesListView(
-                    viewModel: searchViewModel,
-                    authViewModel: authViewModel,
-                    makeMovieDetailsViewModel: makeMovieDetailsViewModel,
-                    makeSelectListViewModel: makeSelectListViewModel
-                )
-            }
-            .tabItem {
-                Label("Movies", systemImage: "magnifyingglass")
-            }
+            MoviesSearchFlowCoordinator(container: container)
+                .tabItem {
+                    Label("Movies", systemImage: "magnifyingglass")
+                }
 
-            ProfileView(
-                viewModel: profileViewModel,
-                authViewModel: authViewModel,
-                makeListsViewModel: makeListsViewModel,
-                makeMediaListViewModel: makeMediaListViewModel
-            )
-            .tabItem {
-                Label("Profile", systemImage: "person")
-            }
+            ProfileFlowCoordinator(container: container)
+                .tabItem {
+                    Label("Profile", systemImage: "person")
+                }
         }
     }
 }

@@ -19,62 +19,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         options connectionOptions: UIScene.ConnectionOptions
     ) {
 
-        // MARK: - Authentication Dependencies
-
-        guard let baseURL = URL(
-            string: "https://api.themoviedb.org/3"
-        ) else {
-            return
-        }
-
-        let networkClient = URLSessionNetworkClient(
-            baseURL: baseURL,
-            apiKey: Bundle.main.object(
-                forInfoDictionaryKey: "TMDB_API_KEY"
-            ) as? String ?? ""
-        )
-
-        let authContainer = AuthDIContainer(
-            networkClient: networkClient
-        )
-
-        let authViewModel = authContainer.makeAuthViewModel()
-
-        // MARK: - Home Dependencies
-
-        let accountRepository = DefaultAccountRepository(
-            networkClient: networkClient
-        )
-        let movieContainer = MovieDIContainer(
-            networkClient: networkClient,
-            accountRepository: accountRepository
-        )
-        let profileContainer = ProfileDIContainer(
-            networkClient: networkClient,
-            accountRepository: accountRepository
-        )
-
-        let rootView = AppRootView(
-            authViewModel: authViewModel,
-            homeViewModel: movieContainer.makeHomeViewModel(),
-            searchViewModel: movieContainer.makeMoviesListViewModel(source: .search),
-            profileViewModel: profileContainer.makeProfileViewModel(),
-            makeMovieDetailsViewModel: { movieId in
-                movieContainer.makeMovieDetailsViewModel(movieId: movieId)
-            },
-            makeListsViewModel: { sessionId in
-                profileContainer.makeListsViewModel(sessionId: sessionId)
-            },
-            makeSelectListViewModel: { movieId, sessionId in
-                profileContainer.makeSelectListViewModel(movieId: movieId, sessionId: sessionId)
-            },
-            makeMediaListViewModel: { source, sessionId in
-                profileContainer.makeMediaListViewModel(source: source, sessionId: sessionId)
-            },
-            makeMoviesListViewModel: { source in
-                movieContainer.makeMoviesListViewModel(source: source)
-            }
-        )
+        let rootView = AppFlowCoordinator(container: AppDIContainer())
 
         // MARK: - Window Setup
 
