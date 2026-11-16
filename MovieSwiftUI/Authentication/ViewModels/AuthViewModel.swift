@@ -33,7 +33,10 @@ final class AuthViewModel {
         if case .signedIn = authState { return true }
         return false
     }
-
+    var sessionId: String? {
+        if case .signedIn(let sessionId) = authState { return sessionId }
+        return nil
+    }
     init(
         createGuestSessionUseCase: any CreateGuestSessionUseCase,
         createRequestTokenUseCase: any CreateRequestTokenUseCase,
@@ -74,10 +77,8 @@ final class AuthViewModel {
 
             authSessionStorage.saveGuestSessionId(sessionId)
             authState = .guest(sessionId: sessionId)
-        } catch is CancellationError {
-           
         } catch {
-            errorMessage = error.localizedDescription
+            handle(error: error, fallback: "Failed continuing as guest")
         }
     }
 
@@ -105,10 +106,8 @@ final class AuthViewModel {
             authSessionStorage.saveSessionId(sessionId)
             authSessionStorage.removeGuestSessionId()
             authState = .signedIn(sessionId: sessionId)
-        } catch is CancellationError {
-           
         } catch {
-            errorMessage = error.localizedDescription
+            handle(error: error, fallback: "Failed signing in")
         }
     }
 
@@ -119,5 +118,12 @@ final class AuthViewModel {
         authSessionStorage.removeGuestSessionId()
         authState = .missing
         errorMessage = nil
+    }
+    
+    // MARK: - Error Handling
+
+    private func handle(error: Error, fallback: String) {
+        guard !error.isCancellation else { return }
+        errorMessage = error.isInternetConnectionError ? "No internet connection" : fallback
     }
 }

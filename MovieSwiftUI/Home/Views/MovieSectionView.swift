@@ -28,10 +28,9 @@ struct MovieSectionView: View {
 
             Spacer()
 
-            // Navigation will be added with the See All screen.
             Text("See All")
                 .font(.caption)
-                .foregroundStyle(.purple)
+                .foregroundStyle(Color.accentColor)
         }
         .padding(.horizontal)
     }
@@ -55,12 +54,12 @@ struct MovieSectionView: View {
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, minHeight: 210)
 
-        case .loaded(let movies):
+        case .loaded(let items):
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHStack(alignment: .top, spacing: 16) {
-                    ForEach(movies) { movie in
-                        NavigationLink(value: movie) {
-                            MovieCardView(movie: movie)
+                    ForEach(items) { item in
+                        NavigationLink(value: item) {
+                            MovieCardView(item: item)
                         }
                         .buttonStyle(.plain)
                     }

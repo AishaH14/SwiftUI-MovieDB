@@ -37,12 +37,17 @@ final class ListDetailsViewModel {
                 listId: listId
             )
             state = .loaded(details)
-        } catch is CancellationError {
-            // Cancelled: expected, no error shown
-        } catch let error as URLError where error.code == .cancelled {
-            // Cancelled: expected, no error shown
         } catch {
-            state = .failed(error.localizedDescription)
+            handle(error: error)
         }
+    }
+
+    private func handle(error: Error) {
+        guard !error.isCancellation else { return }
+        state = .failed(
+            error.isInternetConnectionError
+                ? "No internet connection"
+                : "Failed loading list details"
+        )
     }
 }

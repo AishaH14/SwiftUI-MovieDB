@@ -37,7 +37,7 @@ struct ProfileView: View {
             .navigationTitle("Profile")
             .navigationBarTitleDisplayMode(.inline)
         }
-        // Reloads the header after signing in from a sign-in page.
+        
         .task(id: authViewModel.isSignedIn) {
             await viewModel.load(authState: authViewModel.authState)
         }
@@ -106,10 +106,7 @@ struct ProfileView: View {
 
     // MARK: - Rows
 
-    private var sessionId: String? {
-        if case .signedIn(let sessionId) = authViewModel.authState { return sessionId }
-        return nil
-    }
+    private var sessionId: String? { authViewModel.sessionId }
 
     private var rows: some View {
         VStack(spacing: 0) {

@@ -79,7 +79,43 @@ final class DefaultListRepository: ListRepository {
             items: response.items.map(makeListItem)
         )
     }
+    func addMovieToList(
+        listId: Int,
+        sessionId: String,
+        movieId: Int
+    ) async throws {
+        _ = try await networkClient.request(
+            ListEndpoints.addMovieToList(
+                listId: listId,
+                sessionId: sessionId,
+                request: ListItemRequestDTO(mediaId: movieId)
+            )
+        )
+    }
 
+    func removeMovieFromList(
+        listId: Int,
+        sessionId: String,
+        movieId: Int
+    ) async throws {
+        _ = try await networkClient.request(
+            ListEndpoints.removeMovieFromList(
+                listId: listId,
+                sessionId: sessionId,
+                request: ListItemRequestDTO(mediaId: movieId)
+            )
+        )
+    }
+
+    func isMovieInList(
+        listId: Int,
+        movieId: Int
+    ) async throws -> Bool {
+        let response = try await networkClient.request(
+            ListEndpoints.itemStatus(listId: listId, movieId: movieId)
+        )
+        return response.itemPresent
+    }
     // MARK: - Helpers
 
     private func makeList(from dto: ListDTO) -> MovieList {

@@ -54,6 +54,11 @@ final class ProfileDIContainer {
         )
     }
     
+    func makeListMoviesUseCase() -> any ListMoviesUseCase {
+        DefaultListMoviesUseCase(
+            listRepository: listRepository
+        )
+    }
     // MARK: - ViewModels
     
     @MainActor
@@ -91,6 +96,16 @@ final class ProfileDIContainer {
         ListDetailsViewModel(
             listId: listId,
             fetchListDetailsUseCase: makeFetchListDetailsUseCase()
+        )
+    }
+    
+    @MainActor
+    func makeSelectListViewModel(movieId: Int, sessionId: String) -> SelectListViewModel {
+        SelectListViewModel(
+            movieId: movieId,
+            sessionId: sessionId,
+            fetchListsUseCase: makeFetchListsUseCase(),
+            listMoviesUseCase: makeListMoviesUseCase()
         )
     }
 }

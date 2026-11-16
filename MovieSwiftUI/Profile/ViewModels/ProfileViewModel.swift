@@ -33,23 +33,25 @@ final class ProfileViewModel {
             state = .guest
 
         case .missing:
-            
             break
+
         case .signedIn(let sessionId):
             state = .loading
-
             do {
-                let account = try await fetchAccountUseCase.execute(
-                    sessionId: sessionId
-                )
+                let account = try await fetchAccountUseCase.execute(sessionId: sessionId)
                 state = .signedIn(account)
-            } catch is CancellationError {
-                // Cancelled: expected, no error shown
-            } catch let error as URLError where error.code == .cancelled {
-                // Cancelled: expected, no error shown
             } catch {
-                state = .failed(error.localizedDescription)
+                handle(error: error)
             }
         }
     }
-}
+
+    private func handle(error: Error) {
+        guard !error.isCancellation else { return }
+        state = .failed(
+            error.isInternetConnectionError
+                ? "No internet connection"
+                : "Failed loading account details"
+        )
+    }
+        }

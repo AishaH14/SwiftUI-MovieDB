@@ -13,15 +13,26 @@ enum ListEndpoints {
     private enum Path {
         static let list = "list"
 
-        static func list(_ listId: Int) -> String {
-            "list/\(listId)"
+        static func listDetails(_ listId: Int) -> String {
+            "\(list)/\(listId)"
         }
 
         static func accountLists(_ accountId: Int) -> String {
             "account/\(accountId)/lists"
         }
-    }
 
+        static func addListItem(_ listId: Int) -> String {
+            "\(listDetails(listId))/add_item"
+        }
+
+        static func removeListItem(_ listId: Int) -> String {
+            "\(listDetails(listId))/remove_item"
+        }
+
+        static func itemStatus(_ listId: Int) -> String {
+            "\(listDetails(listId))/item_status"
+        }
+    }
     // MARK: - Endpoints
 
     static func accountLists(
@@ -52,7 +63,7 @@ enum ListEndpoints {
         sessionId: String
     ) -> APIEndpoint<ListActionResponseDTO> {
         APIEndpoint(
-            path: Path.list(listId),
+            path: Path.listDetails(listId),
             method: .delete,
             queryItems: [.sessionId(sessionId)]
         )
@@ -61,7 +72,42 @@ enum ListEndpoints {
     static func listDetails(
         listId: Int
     ) -> APIEndpoint<ListDetailsResponseDTO> {
-        APIEndpoint(path:
-        Path.list(listId))
+        APIEndpoint(path: Path.listDetails(listId))
+    }
+    
+    static func addMovieToList(
+        listId: Int,
+        sessionId: String,
+        request: ListItemRequestDTO
+    ) -> APIEndpoint<ListActionResponseDTO> {
+        APIEndpoint(
+            path: Path.addListItem(listId),
+            method: .post,
+            queryItems: [.sessionId(sessionId)],
+            body: request
+        )
+    }
+
+    static func removeMovieFromList(
+        listId: Int,
+        sessionId: String,
+        request: ListItemRequestDTO
+    ) -> APIEndpoint<ListActionResponseDTO> {
+        APIEndpoint(
+            path: Path.removeListItem(listId),
+            method: .post,
+            queryItems: [.sessionId(sessionId)],
+            body: request
+        )
+    }
+
+    static func itemStatus(
+        listId: Int,
+        movieId: Int
+    ) -> APIEndpoint<ItemStatusResponseDTO> {
+        APIEndpoint(
+            path: Path.itemStatus(listId),
+            queryItems: [.movieId(movieId)]
+        )
     }
 }

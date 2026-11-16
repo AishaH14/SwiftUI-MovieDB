@@ -15,8 +15,13 @@ final class HomeViewModel {
 
     enum SectionState {
         case loading
-        case loaded([MovieSummary])
+        case loaded([MovieCardItemViewModel])
         case failed(String)
+
+        var isLoaded: Bool {
+            if case .loaded = self { return true }
+            return false
+        }
     }
 
     private let fetchMoviesUseCase: any FetchMoviesUseCase
@@ -42,8 +47,7 @@ final class HomeViewModel {
     }
 
     func loadMovies(for section: MovieSection) async {
-        if case .loaded = state(for: section) {
-        } else {
+        if !state(for: section).isLoaded {
             sectionStates[section] = .loading
         }
 
@@ -52,13 +56,20 @@ final class HomeViewModel {
                 section: section,
                 page: 1
             )
-            sectionStates[section] = .loaded(moviesPage.movies)
-        } catch is CancellationError {
-            // Cancelled: expected, no error shown
-        } catch let error as URLError where error.code == .cancelled {
-            // Cancelled: expected, no error shown
+            sectionStates[section] = .loaded(
+                moviesPage.movies.map(MovieCardItemViewModel.init(movie:))
+            )
         } catch {
-            sectionStates[section] = .failed(error.localizedDescription)
+            handle(error: error, for: section)
         }
+    }
+
+    private func handle(error: Error, for section: MovieSection) {
+        guard !error.isCancellation else { return }
+        sectionStates[section] = .failed(
+            error.isInternetConnectionError
+                ? "No internet connection"
+                : "Failed loading movies"
+        )
     }
 }

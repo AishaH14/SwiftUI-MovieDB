@@ -50,12 +50,12 @@ struct ListsView: View {
                 Text("This list and all its movies will be permanently deleted. This action cannot be undone.")
             }
             .alert(
-                "Couldn't delete the list",
-                isPresented: isShowingDeleteError
+                "Error",
+                isPresented: isShowingError
             ) {
                 Button("OK", role: .cancel) { }
             } message: {
-                Text(viewModel.deleteErrorMessage ?? "")
+                Text(viewModel.errorMessage ?? "")
             }
             .task {
                 await viewModel.loadFirstPage()
@@ -71,10 +71,10 @@ struct ListsView: View {
         )
     }
 
-    private var isShowingDeleteError: Binding<Bool> {
+    private var isShowingError: Binding<Bool> { 
         Binding(
-            get: { viewModel.deleteErrorMessage != nil },
-            set: { if !$0 { viewModel.deleteErrorMessage = nil } }
+            get: { viewModel.errorMessage != nil },
+            set: { if !$0 { viewModel.errorMessage = nil } }
         )
     }
 
@@ -112,7 +112,7 @@ struct ListsView: View {
                             viewModel: viewModel.makeListDetailsViewModel(listId: list.id)
                         )
                     } label: {
-                        ListRow(list: list)
+                        ListRowView(list: list)
                     }
                         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                             Button {
@@ -136,37 +136,4 @@ struct ListsView: View {
         }
     }
     
-}
-
-// MARK: - Row
-
-private struct ListRow: View {
-
-    let list: MovieList
-
-    var body: some View {
-        HStack(spacing: 12) {
-            AsyncImage(url: list.posterURL) { phase in
-                if case .success(let image) = phase {
-                    image
-                        .resizable()
-                        .scaledToFill()
-                } else {
-                    Image(systemName: "film")
-                        .foregroundStyle(.secondary)
-                }
-            }
-            .frame(width: 48, height: 64)
-            .background(Color.gray.opacity(0.2))
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(list.name)
-                    .font(.headline)
-                Text("\(list.itemCount) movies")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-        }
-    }
 }

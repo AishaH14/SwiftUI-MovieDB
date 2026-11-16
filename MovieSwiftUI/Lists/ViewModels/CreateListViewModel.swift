@@ -34,7 +34,6 @@ final class CreateListViewModel {
         self.createListUseCase = createListUseCase
     }
 
-    /// Returns true when the list is created.
     func create() async -> Bool {
         guard canCreate else { return false }
 
@@ -50,7 +49,9 @@ final class CreateListViewModel {
             )
             return true
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = error.isInternetConnectionError
+                ? "No internet connection"
+                : "Failed creating the list"
             return false
         }
     }

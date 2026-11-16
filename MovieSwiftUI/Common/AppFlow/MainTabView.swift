@@ -15,12 +15,15 @@ struct MainTabView: View {
     let authViewModel: AuthViewModel
     let makeMovieDetailsViewModel: (Int) -> MovieDetailsViewModel
     let makeListsViewModel: (String) -> ListsViewModel
-
+    let makeSelectListViewModel: (Int, String) -> SelectListViewModel
+    
     var body: some View {
         TabView {
             HomeView(
                 viewModel: homeViewModel,
-                makeMovieDetailsViewModel: makeMovieDetailsViewModel
+                authViewModel: authViewModel,
+                makeMovieDetailsViewModel: makeMovieDetailsViewModel,
+                makeSelectListViewModel: makeSelectListViewModel
             )
             .tabItem {
                 Label("Home", systemImage: "house")

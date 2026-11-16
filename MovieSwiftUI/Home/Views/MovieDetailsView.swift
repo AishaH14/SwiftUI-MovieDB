@@ -11,14 +11,39 @@ import SwiftUI
 struct MovieDetailsView: View {
 
     @State private var viewModel: MovieDetailsViewModel
+    @State private var isShowingSelectList = false
+    @State private var isShowingSignIn = false
+    private let authViewModel: AuthViewModel
+    private let makeSelectListViewModel: (Int, String) -> SelectListViewModel
 
-    init(viewModel: MovieDetailsViewModel) {
+    init(
+        viewModel: MovieDetailsViewModel,
+        authViewModel: AuthViewModel,
+        makeSelectListViewModel: @escaping (Int, String) -> SelectListViewModel
+    ) {
         _viewModel = State(initialValue: viewModel)
+        self.authViewModel = authViewModel
+        self.makeSelectListViewModel = makeSelectListViewModel
     }
 
     var body: some View {
         content
             .navigationBarTitleDisplayMode(.inline)
+            .sheet(isPresented: $isShowingSelectList) {
+                if let sessionId = authViewModel.sessionId {
+                    SelectListView(
+                        viewModel: makeSelectListViewModel(viewModel.movieId, sessionId)
+                    )
+                }
+            }
+            .navigationDestination(isPresented: $isShowingSignIn) {
+                SignInPromptView(
+                    authViewModel: authViewModel,
+                    navigationTitle: "My Lists",
+                    title: "Sign in to use My Lists",
+                    message: "Sign in to TMDB to add movies to your lists."
+                )
+            }
             .task {
                 await viewModel.loadDetails()
             }
@@ -98,7 +123,17 @@ struct MovieDetailsView: View {
         HStack {
             MovieActionButton(title: "Add Watchlist", systemImage: "bookmark")
             MovieActionButton(title: "Add Favorite", systemImage: "heart")
-            MovieActionButton(title: "Add to List", systemImage: "text.badge.plus")
+
+            Button {
+                if authViewModel.isSignedIn {
+                    isShowingSelectList = true
+                } else {
+                    isShowingSignIn = true
+                }
+            } label: {
+                MovieActionLabel(title: "Add to List", systemImage: "text.badge.plus")
+            }
+            .foregroundStyle(Color.gray)
         }
     }
 
@@ -107,6 +142,9 @@ struct MovieDetailsView: View {
         return URL(string: "https://image.tmdb.org/t/p/w780\(posterPath)")
     }
 }
+
+// MARK: - Action Button
+
 private struct MovieActionButton: View {
 
     let title: String
@@ -118,15 +156,28 @@ private struct MovieActionButton: View {
         Button {
             isSelected.toggle()
         } label: {
-            VStack(spacing: 6) {
-                Image(systemName: isSelected ? "checkmark" : systemImage)
-                    .font(.title3)
-
-                Text(title)
-                    .font(.caption)
-            }
-            .frame(maxWidth: .infinity)
+            MovieActionLabel(
+                title: title,
+                systemImage: isSelected ? "checkmark" : systemImage
+            )
         }
         .foregroundStyle(isSelected ? Color.green : Color.gray)
+    }
+}
+
+private struct MovieActionLabel: View {
+
+    let title: String
+    let systemImage: String
+
+    var body: some View {
+        VStack(spacing: 6) {
+            Image(systemName: systemImage)
+                .font(.title3)
+
+            Text(title)
+                .font(.caption)
+        }
+        .frame(maxWidth: .infinity)
     }
 }

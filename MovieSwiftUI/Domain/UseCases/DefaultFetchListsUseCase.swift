@@ -26,10 +26,46 @@ final class DefaultFetchListsUseCase: FetchListsUseCase {
             sessionId: sessionId
         )
 
-        return try await listRepository.fetchLists(
+        let listsPage = try await listRepository.fetchLists(
             accountId: account.id,
             sessionId: sessionId,
             page: page
         )
+
+        return MovieListsPage(
+            page: listsPage.page,
+            totalPages: listsPage.totalPages,
+            lists: await withCoverPosters(listsPage.lists)
+        )
     }
-}
+
+    private func withCoverPosters(_ lists: [MovieList]) async -> [MovieList] {
+        let listRepository = listRepository
+
+        return await withTaskGroup(of: (Int, MovieList).self) { group in
+            for (index, list) in lists.enumerated() {
+                group.addTask {
+                    guard list.posterPath == nil, list.itemCount > 0,
+                          let details = try? await listRepository.fetchListDetails(listId: list.id)
+                    else { return (index, list) }
+
+                    let coverList = MovieList(
+                        id: list.id,
+                        name: list.name,
+                        description: list.description,
+                        itemCount: list.itemCount,
+                        posterPath: details.items.first?.posterPath
+                    )
+                    return (index, coverList)
+                }
+            }
+
+            var result = lists
+            for await (index, list) in group {
+                result[index] = list
+            }
+            return result
+        }
+    }
+        
+    }

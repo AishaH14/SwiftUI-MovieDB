@@ -27,7 +27,7 @@ final class ListsViewModel {
     private(set) var state: State = .loading
     private(set) var lists: [MovieList] = []
     private(set) var isLoadingNextPage = false
-    var deleteErrorMessage: String?
+    var errorMessage: String?
 
     private var currentPage = 0
     private var totalPages = 1
@@ -55,6 +55,8 @@ final class ListsViewModel {
     }
     // MARK: - Loading
 
+    // MARK: - Loading
+
     func loadFirstPage() async {
         state = .loading
         currentPage = 0
@@ -69,12 +71,9 @@ final class ListsViewModel {
             currentPage = page.page
             totalPages = page.totalPages
             state = .loaded
-        } catch is CancellationError {
-            
-        } catch let error as URLError where error.code == .cancelled {
-            
         } catch {
-            state = .failed(error.localizedDescription)
+            guard !error.isCancellation else { return }
+            state = .failed(message(for: error, fallback: "Failed loading lists"))
         }
     }
 
@@ -95,7 +94,8 @@ final class ListsViewModel {
             currentPage = page.page
             totalPages = page.totalPages
         } catch {
-           
+            guard !error.isCancellation else { return }
+            errorMessage = message(for: error, fallback: "Failed loading more lists")
         }
     }
 
@@ -112,8 +112,14 @@ final class ListsViewModel {
             await loadFirstPage()
 
             if lists.contains(where: { $0.id == list.id }) {
-                deleteErrorMessage = error.localizedDescription
+                errorMessage = message(for: error, fallback: "Failed deleting the list")
             }
         }
+    }
+
+    // MARK: - Error Handling
+
+    private func message(for error: Error, fallback: String) -> String {
+        error.isInternetConnectionError ? "No internet connection" : fallback
     }
 }

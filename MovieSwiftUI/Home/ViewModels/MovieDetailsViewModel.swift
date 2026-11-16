@@ -19,7 +19,7 @@ final class MovieDetailsViewModel {
         case failed(String)
     }
 
-    private let movieId: Int
+    let movieId: Int
     private let fetchMovieDetailsUseCase: any FetchMovieDetailsUseCase
 
     private(set) var state: State = .loading
@@ -40,12 +40,17 @@ final class MovieDetailsViewModel {
                 movieId: movieId
             )
             state = .loaded(movie)
-        } catch is CancellationError {
-            // Cancelled: expected, no error shown
-        } catch let error as URLError where error.code == .cancelled {
-            // Cancelled: expected, no error shown
         } catch {
-            state = .failed(error.localizedDescription)
+            handle(error: error)
         }
     }
-}
+
+    private func handle(error: Error) {
+        guard !error.isCancellation else { return }
+        state = .failed(
+            error.isInternetConnectionError
+                ? "No internet connection"
+                : "Failed loading movie details"
+        )
+    }
+    }

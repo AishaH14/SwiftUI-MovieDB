@@ -59,6 +59,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             },
             makeListsViewModel: { sessionId in
                 profileContainer.makeListsViewModel(sessionId: sessionId)
+            },
+            makeSelectListViewModel: { movieId, sessionId in
+                profileContainer.makeSelectListViewModel(movieId: movieId, sessionId: sessionId)
             }
         )
         .environmentObject(

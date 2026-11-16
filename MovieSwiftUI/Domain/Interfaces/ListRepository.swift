@@ -14,17 +14,36 @@ protocol ListRepository {
         sessionId: String,
         page: Int
     ) async throws -> MovieListsPage
+
     func createList(
         sessionId: String,
         name: String,
         description: String
     ) async throws -> Int
+
     func deleteList(
         listId: Int,
-        sessionId: String)
-    async throws
-    func fetchListDetails(
-        listId: Int)
-    async throws -> ListDetails
-}
+        sessionId: String
+    ) async throws
 
+    func fetchListDetails(
+        listId: Int
+    ) async throws -> ListDetails
+
+    func addMovieToList(
+        listId: Int,
+        sessionId: String,
+        movieId: Int
+    ) async throws
+
+    func removeMovieFromList(
+        listId: Int,
+        sessionId: String,
+        movieId: Int
+    ) async throws
+
+    func isMovieInList(
+        listId: Int,
+        movieId: Int
+    ) async throws -> Bool
+}
