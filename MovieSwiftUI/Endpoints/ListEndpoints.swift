@@ -61,7 +61,7 @@ enum ListEndpoints {
     static func deleteList(
         listId: Int,
         sessionId: String
-    ) -> APIEndpoint<ListActionResponseDTO> {
+    ) -> APIEndpoint<StatusResponseDTO> {
         APIEndpoint(
             path: Path.listDetails(listId),
             method: .delete,
@@ -79,7 +79,7 @@ enum ListEndpoints {
         listId: Int,
         sessionId: String,
         request: ListItemRequestDTO
-    ) -> APIEndpoint<ListActionResponseDTO> {
+    ) -> APIEndpoint<StatusResponseDTO> {
         APIEndpoint(
             path: Path.addListItem(listId),
             method: .post,
@@ -92,7 +92,7 @@ enum ListEndpoints {
         listId: Int,
         sessionId: String,
         request: ListItemRequestDTO
-    ) -> APIEndpoint<ListActionResponseDTO> {
+    ) -> APIEndpoint<StatusResponseDTO> {
         APIEndpoint(
             path: Path.removeListItem(listId),
             method: .post,

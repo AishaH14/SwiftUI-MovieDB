@@ -13,15 +13,18 @@ struct ProfileView: View {
     @State private var viewModel: ProfileViewModel
     private let authViewModel: AuthViewModel
     private let makeListsViewModel: (String) -> ListsViewModel
+    private let makeMediaListViewModel: (MediaListSource, String) -> MediaListViewModel
 
     init(
         viewModel: ProfileViewModel,
         authViewModel: AuthViewModel,
-        makeListsViewModel: @escaping (String) -> ListsViewModel
+        makeListsViewModel: @escaping (String) -> ListsViewModel,
+        makeMediaListViewModel: @escaping (MediaListSource, String) -> MediaListViewModel
     ) {
         _viewModel = State(initialValue: viewModel)
         self.authViewModel = authViewModel
         self.makeListsViewModel = makeListsViewModel
+        self.makeMediaListViewModel = makeMediaListViewModel
     }
 
     var body: some View {
@@ -153,9 +156,10 @@ struct ProfileView: View {
 
     @ViewBuilder
     private var favoritesRow: some View {
-        if sessionId != nil {
-            // Favorites screen is planned for Week 04.
-            Button {} label: {
+        if let sessionId {
+            NavigationLink {
+                MediaListView(viewModel: makeMediaListViewModel(.favorites, sessionId))
+            } label: {
                 ProfileRowLabel(title: "Favorites", systemImage: "heart")
             }
         } else {
@@ -170,9 +174,10 @@ struct ProfileView: View {
 
     @ViewBuilder
     private var watchlistRow: some View {
-        if sessionId != nil {
-            // Watchlist screen is planned for Week 04.
-            Button {} label: {
+        if let sessionId {
+            NavigationLink {
+                MediaListView(viewModel: makeMediaListViewModel(.watchlist, sessionId))
+            } label: {
                 ProfileRowLabel(title: "Watchlist", systemImage: "bookmark")
             }
         } else {

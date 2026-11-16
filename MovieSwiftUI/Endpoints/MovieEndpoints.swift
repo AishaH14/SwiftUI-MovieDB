@@ -28,6 +28,16 @@ enum MovieEndpoints {
     static func details(movieId: Int) -> APIEndpoint<MovieDTO> {
         APIEndpoint(path: "movie/\(movieId)")
     }
+    static func accountStates(
+        movieId: Int,
+        sessionId: String
+    ) -> APIEndpoint<AccountStatesResponseDTO> {
+        APIEndpoint(
+            path: "movie/\(movieId)/account_states",
+            queryItems: [.sessionId(sessionId)]
+        )
+    }
+    
     private static func movies(
         path: String,
         page: Int

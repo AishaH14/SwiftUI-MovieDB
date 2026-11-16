@@ -16,7 +16,8 @@ struct MainTabView: View {
     let makeMovieDetailsViewModel: (Int) -> MovieDetailsViewModel
     let makeListsViewModel: (String) -> ListsViewModel
     let makeSelectListViewModel: (Int, String) -> SelectListViewModel
-    
+    let makeMediaListViewModel: (MediaListSource, String) -> MediaListViewModel
+
     var body: some View {
         TabView {
             HomeView(
@@ -37,7 +38,8 @@ struct MainTabView: View {
             ProfileView(
                 viewModel: profileViewModel,
                 authViewModel: authViewModel,
-                makeListsViewModel: makeListsViewModel
+                makeListsViewModel: makeListsViewModel,
+                makeMediaListViewModel: makeMediaListViewModel
             )
             .tabItem {
                 Label("Profile", systemImage: "person")

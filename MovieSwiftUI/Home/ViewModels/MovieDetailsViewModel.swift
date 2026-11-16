@@ -21,36 +21,96 @@ final class MovieDetailsViewModel {
 
     let movieId: Int
     private let fetchMovieDetailsUseCase: any FetchMovieDetailsUseCase
+    private let movieUserStateUseCase: any MovieUserStateUseCase
 
     private(set) var state: State = .loading
+    private(set) var isFavorite = false
+    private(set) var isInWatchlist = false
+    private(set) var isUpdatingFavorite = false
+    private(set) var isUpdatingWatchlist = false
+    var errorMessage: String?
 
     init(
         movieId: Int,
-        fetchMovieDetailsUseCase: any FetchMovieDetailsUseCase
+        fetchMovieDetailsUseCase: any FetchMovieDetailsUseCase,
+        movieUserStateUseCase: any MovieUserStateUseCase
     ) {
         self.movieId = movieId
         self.fetchMovieDetailsUseCase = fetchMovieDetailsUseCase
+        self.movieUserStateUseCase = movieUserStateUseCase
     }
+
+    // MARK: - Details
 
     func loadDetails() async {
         state = .loading
 
         do {
-            let movie = try await fetchMovieDetailsUseCase.execute(
-                movieId: movieId
-            )
+            let movie = try await fetchMovieDetailsUseCase.execute(movieId: movieId)
             state = .loaded(movie)
         } catch {
-            handle(error: error)
+            guard !error.isCancellation else { return }
+            state = .failed(message(for: error, fallback: "Failed loading movie details"))
         }
     }
 
-    private func handle(error: Error) {
-        guard !error.isCancellation else { return }
-        state = .failed(
-            error.isInternetConnectionError
-                ? "No internet connection"
-                : "Failed loading movie details"
-        )
+    // MARK: - User State
+
+    func loadUserState(sessionId: String) async {
+        do {
+            let userState = try await movieUserStateUseCase.fetchState(
+                movieId: movieId,
+                sessionId: sessionId
+            )
+            isFavorite = userState.isFavorite
+            isInWatchlist = userState.isInWatchlist
+        } catch {
+            guard !error.isCancellation else { return }
+            errorMessage = message(for: error, fallback: "Failed loading your movie status")
+        }
     }
+
+    func toggleFavorite(sessionId: String) async {
+        guard !isUpdatingFavorite else { return }
+        isUpdatingFavorite = true
+        defer { isUpdatingFavorite = false }
+
+        let newValue = !isFavorite
+        do {
+            try await movieUserStateUseCase.updateFavorite(
+                movieId: movieId,
+                favorite: newValue,
+                sessionId: sessionId
+            )
+            isFavorite = newValue
+        } catch {
+            guard !error.isCancellation else { return }
+            errorMessage = message(for: error, fallback: "Failed updating favorites")
+        }
     }
+
+    func toggleWatchlist(sessionId: String) async {
+        guard !isUpdatingWatchlist else { return }
+        isUpdatingWatchlist = true
+        defer { isUpdatingWatchlist = false }
+
+        let newValue = !isInWatchlist
+        do {
+            try await movieUserStateUseCase.updateWatchlist(
+                movieId: movieId,
+                watchlist: newValue,
+                sessionId: sessionId
+            )
+            isInWatchlist = newValue
+        } catch {
+            guard !error.isCancellation else { return }
+            errorMessage = message(for: error, fallback: "Failed updating watchlist")
+        }
+    }
+
+    // MARK: - Error Handling
+
+    private func message(for error: Error, fallback: String) -> String {
+        error.isInternetConnectionError ? "No internet connection" : fallback
+    }
+}

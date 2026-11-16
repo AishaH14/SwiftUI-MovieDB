@@ -21,3 +21,8 @@ struct MoviesPage: Sendable {
     let totalPages: Int
     let movies: [MovieSummary]
 }
+
+struct MovieUserState: Sendable {
+    let isFavorite: Bool
+    let isInWatchlist: Bool
+}

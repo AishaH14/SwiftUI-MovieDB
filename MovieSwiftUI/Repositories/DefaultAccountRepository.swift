@@ -20,11 +20,68 @@ final class DefaultAccountRepository: AccountRepository {
         let response = try await networkClient.request(
             AccountEndpoints.details(sessionId: sessionId)
         )
+        return response.toDomain()
+    }
 
-        return Account(
-            id: response.id,
-            username: response.username,
-            avatarPath: response.avatar?.tmdb?.avatarPath
+    func fetchMovieUserState(
+        movieId: Int,
+        sessionId: String
+    ) async throws -> MovieUserState {
+        let response = try await networkClient.request(
+            MovieEndpoints.accountStates(movieId: movieId, sessionId: sessionId)
         )
+        return response.toDomain()
+    }
+
+    func updateFavorite(
+        accountId: Int,
+        sessionId: String,
+        movieId: Int,
+        favorite: Bool
+    ) async throws {
+        _ = try await networkClient.request(
+            AccountEndpoints.updateFavorite(
+                accountId: accountId,
+                sessionId: sessionId,
+                request: UpdateFavoriteRequestDTO(mediaId: movieId, favorite: favorite)
+            )
+        )
+    }
+
+    func updateWatchlist(
+        accountId: Int,
+        sessionId: String,
+        movieId: Int,
+        watchlist: Bool
+    ) async throws {
+        _ = try await networkClient.request(
+            AccountEndpoints.updateWatchlist(
+                accountId: accountId,
+                sessionId: sessionId,
+                request: UpdateWatchlistRequestDTO(mediaId: movieId, watchlist: watchlist)
+            )
+        )
+    }
+
+    func fetchFavoriteMovies(
+        accountId: Int,
+        sessionId: String,
+        page: Int
+    ) async throws -> MoviesPage {
+        let response = try await networkClient.request(
+            AccountEndpoints.favoriteMovies(accountId: accountId, sessionId: sessionId, page: page)
+        )
+        return response.toDomain()
+    }
+
+    func fetchWatchlistMovies(
+        accountId: Int,
+        sessionId: String,
+        page: Int
+    ) async throws -> MoviesPage {
+        let response = try await networkClient.request(
+            AccountEndpoints.watchlistMovies(accountId: accountId, sessionId: sessionId, page: page)
+        )
+        return response.toDomain()
     }
 }
